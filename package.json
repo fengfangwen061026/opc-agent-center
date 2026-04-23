@@ -1,0 +1,31 @@
+{
+  "name": "opc-agent-center",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n bridge,web -c cyan,magenta \"pnpm --filter @opc/bridge dev\" \"pnpm --filter @opc/web dev --host 0.0.0.0\"",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "test:e2e": "playwright test -c apps/web/playwright.config.ts",
+    "services:install": "bash scripts/install-services.sh",
+    "services:start": "bash scripts/start-services.sh",
+    "services:hermes-profile": "bash scripts/setup-hermes-opc-profile.sh",
+    "format": "prettier --check .",
+    "format:write": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.14.0",
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^25.6.0",
+    "concurrently": "^9.1.0",
+    "eslint": "^9.14.0",
+    "globals": "^15.12.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.13.0"
+  }
+}

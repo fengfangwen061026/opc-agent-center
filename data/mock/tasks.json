@@ -1,0 +1,171 @@
+[
+  {
+    "taskId": "task-webpage-capture",
+    "title": "把 OpenClaw 技能规范捕获到 Obsidian",
+    "createdAt": "2026-04-22T13:40:00.000Z",
+    "completedAt": "2026-04-22T13:46:12.000Z",
+    "status": "completed",
+    "requester": {
+      "type": "user",
+      "channel": "telegram",
+      "conversationId": "conv-telegram-sources"
+    },
+    "conductorAgentId": "agent-conductor",
+    "workerAgentIds": ["agent-knowledge-curator"],
+    "goal": "把公开参考页面连同来源元数据保存到 OPC Obsidian 审核队列。",
+    "risk": "S2",
+    "skillsUsed": ["capture-webpage-to-obsidian", "capsule-summarizer"],
+    "inputsSummary": ["Telegram 消息里包含 OpenClaw 技能文档 URL。"],
+    "actionsSummary": [
+      "抓取公开网页内容。",
+      "标准化标题结构并提取来源元数据。",
+      "把草稿笔记写入 Obsidian 审核队列。"
+    ],
+    "outputs": [
+      {
+        "type": "obsidian_note",
+        "label": "OpenClaw Skill Standards.md",
+        "uri": "obsidian:/08_Review_Queue/OpenClaw Skill Standards.md"
+      },
+      {
+        "type": "capsule",
+        "label": "任务 Capsule",
+        "uri": "data/capsules/2026/04/22/task-webpage-capture.json"
+      }
+    ],
+    "verification": ["Schema parse 已通过。", "审核队列路径符合写入策略。"],
+    "problems": [],
+    "memoryCandidates": ["用户偏好：捕获的参考资料先进入审核队列。"],
+    "skillCandidates": [],
+    "notificationsCreated": ["notif-webpage-capture"],
+    "metrics": {
+      "durationMs": 372000,
+      "tokensIn": 4200,
+      "tokensOut": 1600,
+      "estimatedCostUsd": 0.42,
+      "toolCalls": 6
+    },
+    "confidence": 0.93
+  },
+  {
+    "taskId": "task-trend-brief",
+    "title": "侦察 AI 智能体操作系统趋势",
+    "createdAt": "2026-04-22T14:05:00.000Z",
+    "status": "running",
+    "requester": {
+      "type": "user",
+      "channel": "panel",
+      "conversationId": "conv-panel-command"
+    },
+    "conductorAgentId": "agent-conductor",
+    "workerAgentIds": ["agent-research-scout"],
+    "goal": "为 Skill-first 个人 AI 操作系统生成一份紧凑趋势简报。",
+    "risk": "S1",
+    "skillsUsed": ["daily-trend-scout"],
+    "inputsSummary": ["面板命令要求执行晨间趋势扫描。"],
+    "actionsSummary": ["聚类公开来源信号。", "标记三个候选写作角度。", "正在准备来源可信度说明。"],
+    "outputs": [
+      {
+        "type": "draft",
+        "label": "趋势简报草稿",
+        "uri": "obsidian:/06_Drafts/trends/2026-04-22-agent-os.md"
+      }
+    ],
+    "verification": ["来源可信度评分进行中。"],
+    "problems": [],
+    "memoryCandidates": [],
+    "skillCandidates": [],
+    "notificationsCreated": [],
+    "metrics": {
+      "tokensIn": 11800,
+      "tokensOut": 2400,
+      "estimatedCostUsd": 1.12,
+      "toolCalls": 11
+    },
+    "confidence": 0.71
+  },
+  {
+    "taskId": "task-codex-feature",
+    "title": "把驾驶舱脚手架委派给 Codex",
+    "createdAt": "2026-04-22T14:07:30.000Z",
+    "status": "waiting_approval",
+    "requester": {
+      "type": "user",
+      "channel": "panel",
+      "conversationId": "conv-panel-command"
+    },
+    "conductorAgentId": "agent-conductor",
+    "workerAgentIds": ["agent-dev-operator"],
+    "externalAgentIds": ["agent-codex"],
+    "goal": "准备一个受限的 mock 驾驶舱实现，并等待代码审核。",
+    "risk": "S3",
+    "skillsUsed": ["codex-delegate", "approval-risk-gate"],
+    "inputsSummary": ["用户要求实现 OPC 驾驶舱的首批阶段。"],
+    "actionsSummary": [
+      "Dev Operator 界定实现范围。",
+      "Codex 运行创建了本地脚手架变更。",
+      "任何 push 或 merge 前都必须审批。"
+    ],
+    "outputs": [
+      {
+        "type": "code_run",
+        "label": "Codex 驾驶舱脚手架运行",
+        "uri": "coding-run:run-codex-dashboard"
+      }
+    ],
+    "verification": ["本地 typecheck 待执行。", "没有尝试外部 push。"],
+    "problems": ["等待用户审批代码审核通知。"],
+    "memoryCandidates": [],
+    "skillCandidates": ["UI 稳定后增加可复用 React Flow 星座图技能。"],
+    "notificationsCreated": ["notif-codex-review"],
+    "metrics": {
+      "tokensIn": 20600,
+      "tokensOut": 7200,
+      "estimatedCostUsd": 4.9,
+      "toolCalls": 22
+    },
+    "confidence": 0.78
+  },
+  {
+    "taskId": "task-publish-draft",
+    "title": "起草 OPC SkillOS 发布文章",
+    "createdAt": "2026-04-22T13:22:00.000Z",
+    "status": "blocked",
+    "requester": {
+      "type": "user",
+      "channel": "wechat",
+      "conversationId": "conv-wechat-publishing"
+    },
+    "conductorAgentId": "agent-conductor",
+    "workerAgentIds": ["agent-publishing-editor"],
+    "goal": "起草发布文章，但不执行发布。",
+    "risk": "S3",
+    "skillsUsed": ["article-draft", "approval-risk-gate"],
+    "inputsSummary": ["微信消息要求生成简短公开发布文章。"],
+    "actionsSummary": [
+      "请求 Hermes 上下文包。",
+      "创建文章大纲。",
+      "因为发布渠道目标不明确而阻塞。"
+    ],
+    "outputs": [
+      {
+        "type": "draft",
+        "label": "发布文章大纲",
+        "uri": "obsidian:/06_Drafts/articles/opc-skillos-launch.md"
+      }
+    ],
+    "verification": ["没有尝试发布动作。"],
+    "problems": ["需要用户决定渠道和语气。"],
+    "memoryCandidates": [],
+    "skillCandidates": [],
+    "notificationsCreated": ["notif-publish-blocked"],
+    "metrics": {
+      "durationMs": 540000,
+      "tokensIn": 9400,
+      "tokensOut": 3100,
+      "estimatedCostUsd": 1.76,
+      "toolCalls": 8
+    },
+    "confidence": 0.64
+  }
+]

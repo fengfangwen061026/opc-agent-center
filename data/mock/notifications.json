@@ -1,0 +1,146 @@
+[
+  {
+    "id": "notif-codex-review",
+    "type": "code_review",
+    "severity": "warning",
+    "status": "waiting_action",
+    "title": "Codex 变更需要审核",
+    "summary": "Dev Operator 已准备本地驾驶舱脚手架运行；push、merge 或 deploy 前必须审核。",
+    "createdAt": "2026-04-22T14:16:00.000Z",
+    "source": {
+      "agentId": "agent-dev-operator",
+      "taskId": "task-codex-feature",
+      "skillName": "codex-delegate",
+      "connector": "codex"
+    },
+    "risk": "S3",
+    "actions": [
+      {
+        "id": "approve-codex-review",
+        "label": "批准",
+        "type": "approve"
+      },
+      {
+        "id": "request-codex-changes",
+        "label": "要求修改",
+        "type": "request_changes"
+      },
+      {
+        "id": "open-codex-task",
+        "label": "打开任务",
+        "type": "open_task"
+      }
+    ],
+    "links": [
+      {
+        "label": "任务详情",
+        "href": "task:task-codex-feature",
+        "kind": "task"
+      }
+    ]
+  },
+  {
+    "id": "notif-publish-blocked",
+    "type": "blocked",
+    "severity": "warning",
+    "status": "waiting_action",
+    "title": "发布草稿已阻塞",
+    "summary": "Publishing Editor 需要目标渠道和语气，才能继续发布文章草稿。",
+    "createdAt": "2026-04-22T13:58:00.000Z",
+    "source": {
+      "agentId": "agent-publishing-editor",
+      "taskId": "task-publish-draft",
+      "skillName": "article-draft"
+    },
+    "risk": "S3",
+    "actions": [
+      {
+        "id": "open-publish-task",
+        "label": "打开任务",
+        "type": "open_task"
+      },
+      {
+        "id": "ask-publishing-followup",
+        "label": "追问",
+        "type": "ask_agent_followup"
+      }
+    ],
+    "links": [
+      {
+        "label": "草稿笔记",
+        "href": "obsidian:/06_Drafts/articles/opc-skillos-launch.md",
+        "kind": "obsidian"
+      }
+    ]
+  },
+  {
+    "id": "notif-webpage-capture",
+    "type": "task_report",
+    "severity": "success",
+    "status": "unread",
+    "title": "来源已捕获到审核队列",
+    "summary": "Knowledge Curator 已保存 OpenClaw 技能规范来源笔记，并生成 Capsule。",
+    "createdAt": "2026-04-22T13:46:20.000Z",
+    "source": {
+      "agentId": "agent-knowledge-curator",
+      "taskId": "task-webpage-capture",
+      "skillName": "capture-webpage-to-obsidian",
+      "connector": "obsidian"
+    },
+    "risk": "S2",
+    "actions": [
+      {
+        "id": "open-captured-note",
+        "label": "打开笔记",
+        "type": "open_obsidian_note"
+      },
+      {
+        "id": "mark-capture-resolved",
+        "label": "标记解决",
+        "type": "mark_resolved"
+      }
+    ],
+    "links": [
+      {
+        "label": "审核队列笔记",
+        "href": "obsidian:/08_Review_Queue/OpenClaw Skill Standards.md",
+        "kind": "obsidian"
+      }
+    ]
+  },
+  {
+    "id": "notif-hermes-skill-patch",
+    "type": "skill_patch",
+    "severity": "info",
+    "status": "unread",
+    "title": "Hermes 提出了技能补丁",
+    "summary": "Hermes 发现 skill-reflection 需要更小的 Capsule 输入契约，并提出草稿补丁。",
+    "createdAt": "2026-04-22T14:04:40.000Z",
+    "source": {
+      "agentId": "agent-hermes",
+      "taskId": "task-skill-reflection",
+      "skillName": "skill-reflection",
+      "connector": "hermes"
+    },
+    "risk": "S2",
+    "actions": [
+      {
+        "id": "open-skill-diff",
+        "label": "打开 diff",
+        "type": "open_skill_diff"
+      },
+      {
+        "id": "mark-skill-patch-resolved",
+        "label": "标记解决",
+        "type": "mark_resolved"
+      }
+    ],
+    "links": [
+      {
+        "label": "技能补丁",
+        "href": "skill:skill-reflection#patch",
+        "kind": "skill"
+      }
+    ]
+  }
+]

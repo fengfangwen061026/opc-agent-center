@@ -1,0 +1,57 @@
+[
+  {
+    "id": "evt-webpage-captured",
+    "timestamp": "2026-04-22T13:46:20.000Z",
+    "source": "obsidian",
+    "type": "task.completed",
+    "payload": {
+      "taskId": "task-webpage-capture",
+      "agentId": "agent-knowledge-curator",
+      "title": "来源已捕获到审核队列"
+    }
+  },
+  {
+    "id": "evt-hermes-patch",
+    "timestamp": "2026-04-22T14:04:40.000Z",
+    "source": "hermes",
+    "type": "notification.created",
+    "payload": {
+      "notificationId": "notif-hermes-skill-patch",
+      "skillName": "skill-reflection",
+      "title": "Hermes 提出了技能补丁"
+    }
+  },
+  {
+    "id": "evt-trend-running",
+    "timestamp": "2026-04-22T14:10:10.000Z",
+    "source": "gateway",
+    "type": "agent.status_changed",
+    "payload": {
+      "taskId": "task-trend-brief",
+      "agentId": "agent-research-scout",
+      "status": "running"
+    }
+  },
+  {
+    "id": "evt-codex-review",
+    "timestamp": "2026-04-22T14:16:00.000Z",
+    "source": "bridge",
+    "type": "notification.created",
+    "payload": {
+      "taskId": "task-codex-feature",
+      "notificationId": "notif-codex-review",
+      "title": "Codex 变更需要审核"
+    }
+  },
+  {
+    "id": "evt-publish-blocked",
+    "timestamp": "2026-04-22T13:58:00.000Z",
+    "source": "gateway",
+    "type": "task.blocked",
+    "payload": {
+      "taskId": "task-publish-draft",
+      "agentId": "agent-publishing-editor",
+      "reason": "需要决定渠道和语气"
+    }
+  }
+]

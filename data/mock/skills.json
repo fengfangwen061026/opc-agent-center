@@ -1,0 +1,175 @@
+[
+  {
+    "name": "approval-risk-gate",
+    "description": "把任务风险分级为 S0 到 S4，并为 S3/S4 动作创建审批通知。",
+    "version": "0.2.0",
+    "domain": "governance",
+    "ownerAgent": "agent-conductor",
+    "risk": "S0",
+    "status": "enabled",
+    "trustState": "local",
+    "path": "skills/governance/approval-risk-gate/SKILL.md",
+    "writesTo": ["notification-center"],
+    "externalActions": [],
+    "usage": {
+      "count": 42,
+      "lastUsedAt": "2026-04-22T14:20:00.000Z",
+      "successRate": 0.98
+    },
+    "eval": {
+      "status": "passing",
+      "lastRunAt": "2026-04-22T09:00:00.000Z"
+    }
+  },
+  {
+    "name": "capture-webpage-to-obsidian",
+    "description": "把公开网页捕获为 Obsidian 来源笔记、摘要、标签和审核项。",
+    "version": "0.3.1",
+    "domain": "knowledge",
+    "ownerAgent": "agent-knowledge-curator",
+    "risk": "S2",
+    "status": "enabled",
+    "trustState": "verified",
+    "path": "skills/knowledge/capture-webpage-to-obsidian/SKILL.md",
+    "writesTo": ["obsidian:/01_Sources/web", "obsidian:/08_Review_Queue"],
+    "externalActions": ["read_public_webpage"],
+    "usage": {
+      "count": 128,
+      "lastUsedAt": "2026-04-22T13:44:20.000Z",
+      "successRate": 0.96
+    },
+    "eval": {
+      "status": "passing",
+      "lastRunAt": "2026-04-21T18:10:00.000Z"
+    }
+  },
+  {
+    "name": "daily-trend-scout",
+    "description": "把公开信号聚类成带来源可信度的每日趋势简报。",
+    "version": "0.1.4",
+    "domain": "research",
+    "ownerAgent": "agent-research-scout",
+    "risk": "S1",
+    "status": "enabled",
+    "trustState": "experimental",
+    "path": "skills/research/daily-trend-scout/SKILL.md",
+    "writesTo": ["obsidian:/06_Drafts/trends", "data/capsules"],
+    "externalActions": ["web_search", "read_public_webpage"],
+    "usage": {
+      "count": 31,
+      "lastUsedAt": "2026-04-22T14:18:00.000Z",
+      "successRate": 0.9
+    },
+    "eval": {
+      "status": "passing",
+      "lastRunAt": "2026-04-20T12:30:00.000Z"
+    }
+  },
+  {
+    "name": "codex-delegate",
+    "description": "准备受限编程智能体运行，并在 merge、push 或 deploy 前请求审核。",
+    "version": "0.1.0",
+    "domain": "dev",
+    "ownerAgent": "agent-dev-operator",
+    "risk": "S3",
+    "status": "enabled",
+    "trustState": "local",
+    "path": "skills/dev/codex-delegate/SKILL.md",
+    "writesTo": ["repo-worktree", "notification-center"],
+    "externalActions": ["run_tests", "edit_local_files"],
+    "usage": {
+      "count": 17,
+      "lastUsedAt": "2026-04-22T14:07:30.000Z",
+      "successRate": 0.88
+    },
+    "eval": {
+      "status": "not_configured"
+    }
+  },
+  {
+    "name": "article-draft",
+    "description": "基于 Capsule、上下文包和来源笔记起草微信或博客文章。",
+    "version": "0.2.2",
+    "domain": "publishing",
+    "ownerAgent": "agent-publishing-editor",
+    "risk": "S3",
+    "status": "enabled",
+    "trustState": "local",
+    "path": "skills/publishing/article-draft/SKILL.md",
+    "writesTo": ["obsidian:/06_Drafts/articles", "obsidian:/08_Review_Queue"],
+    "externalActions": [],
+    "usage": {
+      "count": 24,
+      "lastUsedAt": "2026-04-22T13:30:00.000Z",
+      "successRate": 0.84
+    },
+    "eval": {
+      "status": "unknown"
+    }
+  },
+  {
+    "name": "learning-plan-maker",
+    "description": "把已完成任务和研究来源转成复盘卡片与周学习计划。",
+    "version": "0.1.2",
+    "domain": "learning",
+    "ownerAgent": "agent-learning-coach",
+    "risk": "S1",
+    "status": "enabled",
+    "trustState": "local",
+    "path": "skills/learning/learning-plan-maker/SKILL.md",
+    "writesTo": ["obsidian:/04_Learning", "obsidian:/08_Review_Queue"],
+    "externalActions": [],
+    "usage": {
+      "count": 15,
+      "lastUsedAt": "2026-04-20T11:00:00.000Z",
+      "successRate": 0.93
+    },
+    "eval": {
+      "status": "not_configured"
+    }
+  },
+  {
+    "name": "skill-reflection",
+    "description": "反思任务 Capsule，并提出待审核的记忆候选或技能补丁。",
+    "version": "0.1.5",
+    "domain": "ops",
+    "ownerAgent": "agent-hermes",
+    "risk": "S2",
+    "status": "draft",
+    "trustState": "experimental",
+    "path": "skills/hermes/skill-reflection/SKILL.md",
+    "writesTo": ["notification-center", "skills/evolution-inbox"],
+    "externalActions": [],
+    "usage": {
+      "count": 9,
+      "lastUsedAt": "2026-04-22T14:04:00.000Z",
+      "successRate": 0.82
+    },
+    "eval": {
+      "status": "failing",
+      "lastRunAt": "2026-04-22T08:45:00.000Z"
+    }
+  },
+  {
+    "name": "capsule-summarizer",
+    "description": "把已完成任务证据压缩成持久 Capsule 摘要和验证块。",
+    "version": "0.1.0",
+    "domain": "knowledge",
+    "ownerAgent": "agent-knowledge-curator",
+    "risk": "S0",
+    "status": "enabled",
+    "trustState": "bundled",
+    "path": "skills/knowledge/capsule-summarizer/SKILL.md",
+    "writesTo": ["data/capsules"],
+    "externalActions": [],
+    "usage": {
+      "count": 64,
+      "lastUsedAt": "2026-04-22T13:46:00.000Z",
+      "successRate": 0.99
+    },
+    "eval": {
+      "status": "passing",
+      "lastRunAt": "2026-04-21T17:25:00.000Z"
+    }
+  }
+]

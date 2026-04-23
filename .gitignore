@@ -1,0 +1,14 @@
+node_modules
+dist
+.env*
+!.env.example
+*.local
+.vite
+coverage
+*.tsbuildinfo
+test-results
+playwright-report
+data/*.sqlite
+data/runtime/
+external/
+shared-skills/experimental/*-patch-hermes-*

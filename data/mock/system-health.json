@@ -1,0 +1,10 @@
+{
+  "gateway": "connected",
+  "hermes": "available",
+  "obsidian": "connected",
+  "codingAgents": {
+    "codex": "active",
+    "claudeCode": "idle"
+  },
+  "bridge": "running"
+}

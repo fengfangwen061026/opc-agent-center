@@ -1,0 +1,145 @@
+:root {
+  color-scheme: light;
+
+  /* Background */
+  --opc-bg-0: #f8fbff;
+  --opc-bg-1: #fff7fb;
+  --opc-bg-2: #f6f2ff;
+  --opc-bg-3: #f0fff9;
+  --opc-bg-4: #f3fff8;
+
+  /* Glass */
+  --opc-glass: rgba(255, 255, 255, 0.58);
+  --opc-glass-strong: rgba(255, 255, 255, 0.74);
+  --opc-glass-soft: rgba(255, 255, 255, 0.42);
+  --opc-glass-border: rgba(255, 255, 255, 0.72);
+  --opc-glass-border-strong: rgba(255, 255, 255, 0.92);
+  --opc-glass-card-bg: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.76),
+    rgba(255, 255, 255, 0.46)
+  );
+  --opc-glass-card-sheen:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.65), transparent 38%),
+    radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.82), transparent 18%);
+
+  /* Text */
+  --opc-text-0: #182033;
+  --opc-text-1: #46516a;
+  --opc-text-2: #77819a;
+  --opc-text-inverse: #ffffff;
+
+  /* Dopamine colors */
+  --opc-sky: #6ec9ff;
+  --opc-lavender: #b9a6ff;
+  --opc-mint: #85e6c5;
+  --opc-lemon: #ffe17a;
+  --opc-coral: #ff9db0;
+  --opc-peach: #ffc6a8;
+  --opc-aqua: #9ff3ff;
+  --opc-rose: #ffb8df;
+
+  --opc-sky-soft: rgba(110, 201, 255, 0.22);
+  --opc-lavender-soft: rgba(185, 166, 255, 0.22);
+  --opc-mint-soft: rgba(133, 230, 197, 0.22);
+  --opc-lemon-soft: rgba(255, 225, 122, 0.28);
+  --opc-coral-soft: rgba(255, 157, 176, 0.24);
+  --opc-rose-soft: rgba(255, 184, 223, 0.24);
+
+  /* Semantic colors */
+  --opc-success: #53d89b;
+  --opc-warning: #ffd166;
+  --opc-danger: #ff7a90;
+  --opc-info: #68bfff;
+
+  /* Status colors */
+  --opc-status-idle: var(--opc-text-2);
+  --opc-status-planning: var(--opc-lavender);
+  --opc-status-running: var(--opc-sky);
+  --opc-status-running-accent: var(--opc-mint);
+  --opc-status-waiting-approval: var(--opc-lemon);
+  --opc-status-blocked: var(--opc-coral);
+  --opc-status-failed: var(--opc-danger);
+  --opc-status-completed: var(--opc-success);
+  --opc-status-evolving: var(--opc-rose);
+  --opc-status-offline: var(--opc-text-2);
+
+  /* Shadows */
+  --opc-shadow-soft: 0 18px 55px rgba(93, 116, 152, 0.16);
+  --opc-shadow-card: 0 14px 40px rgba(91, 107, 134, 0.13);
+  --opc-shadow-float: 0 24px 90px rgba(91, 107, 134, 0.22);
+  --opc-shadow-focus: 0 0 0 4px rgba(110, 201, 255, 0.24);
+
+  /* Radius */
+  --opc-radius-xs: 10px;
+  --opc-radius-sm: 14px;
+  --opc-radius-md: 20px;
+  --opc-radius-lg: 28px;
+  --opc-radius-xl: 36px;
+
+  /* Blur */
+  --opc-blur: 26px;
+  --opc-blur-strong: 42px;
+
+  /* Layout and motion */
+  --opc-shell-topbar: 76px;
+  --opc-left-nav: 92px;
+  --opc-right-rail: 336px;
+  --opc-duration-fast: 160ms;
+  --opc-duration-normal: 210ms;
+  --opc-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Typography */
+  --opc-font-sans:
+    ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI",
+    "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+.opc-shell-bg {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(110, 201, 255, 0.34), transparent 34%),
+    radial-gradient(circle at 78% 8%, rgba(185, 166, 255, 0.32), transparent 32%),
+    radial-gradient(circle at 86% 78%, rgba(133, 230, 197, 0.28), transparent 34%),
+    radial-gradient(circle at 20% 84%, rgba(255, 157, 176, 0.24), transparent 30%),
+    linear-gradient(135deg, var(--opc-bg-0) 0%, var(--opc-bg-1) 42%, var(--opc-bg-4) 100%);
+}
+
+.opc-glass-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--opc-glass-card-bg);
+  border: 1px solid var(--opc-glass-border);
+  box-shadow: var(--opc-shadow-card);
+  backdrop-filter: blur(var(--opc-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--opc-blur)) saturate(150%);
+  border-radius: var(--opc-radius-lg);
+}
+
+.opc-glass-card::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background: var(--opc-glass-card-sheen);
+  opacity: 0.58;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --opc-duration-fast: 1ms;
+    --opc-duration-normal: 1ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}

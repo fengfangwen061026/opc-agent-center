@@ -1,0 +1,436 @@
+.opc-card {
+  color: var(--opc-text-0);
+  transition:
+    transform var(--opc-duration-normal) var(--opc-ease-out),
+    box-shadow var(--opc-duration-normal) var(--opc-ease-out),
+    border-color var(--opc-duration-normal) var(--opc-ease-out);
+}
+
+.opc-card--interactive:hover {
+  border-color: var(--opc-glass-border-strong);
+  box-shadow: var(--opc-shadow-soft);
+  transform: scale(1.01);
+}
+
+.opc-card__content {
+  position: relative;
+  z-index: 1;
+}
+
+.opc-liquid-button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1rem;
+  color: var(--opc-text-0);
+  font: inherit;
+  font-weight: 760;
+  line-height: 1;
+  cursor: pointer;
+  background: var(--opc-glass-card-bg);
+  border: 1px solid var(--opc-glass-border-strong);
+  border-radius: var(--opc-radius-sm);
+  box-shadow: var(--opc-shadow-card);
+  backdrop-filter: blur(var(--opc-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--opc-blur)) saturate(150%);
+  transition:
+    transform var(--opc-duration-fast) var(--opc-ease-out),
+    box-shadow var(--opc-duration-fast) var(--opc-ease-out);
+}
+
+.opc-liquid-button:hover {
+  box-shadow: var(--opc-shadow-float);
+  transform: translateY(-1px) scale(1.02);
+}
+
+.opc-liquid-button:focus-visible,
+.opc-task-timeline-item:focus-visible {
+  outline: none;
+  box-shadow: var(--opc-shadow-focus);
+}
+
+.opc-liquid-button--primary {
+  background:
+    linear-gradient(135deg, var(--opc-sky-soft), var(--opc-lavender-soft)), var(--opc-glass-card-bg);
+}
+
+.opc-liquid-button--secondary {
+  background:
+    linear-gradient(135deg, var(--opc-mint-soft), var(--opc-sky-soft)), var(--opc-glass-card-bg);
+}
+
+.opc-liquid-button--ghost {
+  background: var(--opc-glass-soft);
+  box-shadow: none;
+}
+
+.opc-liquid-button__icon,
+.opc-metric-card__icon {
+  display: inline-grid;
+  place-items: center;
+}
+
+.opc-status-pill {
+  --opc-pill-color: var(--opc-status-idle);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: fit-content;
+  min-height: 24px;
+  padding: 0.25rem 0.55rem;
+  color: var(--opc-text-1);
+  font-size: 0.76rem;
+  font-weight: 760;
+  line-height: 1;
+  text-transform: capitalize;
+  background: var(--opc-glass-soft);
+  border: 1px solid var(--opc-glass-border);
+  border-radius: var(--opc-radius-xs);
+}
+
+.opc-status-pill[data-status="planning"],
+.opc-status-pill[data-status="draft"] {
+  --opc-pill-color: var(--opc-status-planning);
+}
+
+.opc-status-pill[data-status="running"],
+.opc-status-pill[data-status="active"],
+.opc-status-pill[data-status="queued"] {
+  --opc-pill-color: var(--opc-status-running);
+}
+
+.opc-status-pill[data-status="waiting_approval"],
+.opc-status-pill[data-status="reconnecting"],
+.opc-status-pill[data-status="planned"] {
+  --opc-pill-color: var(--opc-status-waiting-approval);
+}
+
+.opc-status-pill[data-status="blocked"],
+.opc-status-pill[data-status="deprecated"] {
+  --opc-pill-color: var(--opc-status-blocked);
+}
+
+.opc-status-pill[data-status="failed"],
+.opc-status-pill[data-status="offline"],
+.opc-status-pill[data-status="unavailable"],
+.opc-status-pill[data-status="disabled"] {
+  --opc-pill-color: var(--opc-status-failed);
+}
+
+.opc-status-pill[data-status="completed"],
+.opc-status-pill[data-status="connected"],
+.opc-status-pill[data-status="available"],
+.opc-status-pill[data-status="enabled"] {
+  --opc-pill-color: var(--opc-status-completed);
+}
+
+.opc-status-pill[data-status="evolving"] {
+  --opc-pill-color: var(--opc-status-evolving);
+}
+
+.opc-status-pill__dot {
+  width: 0.52rem;
+  height: 0.52rem;
+  background: var(--opc-pill-color);
+  border-radius: 999px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--opc-pill-color), transparent 78%);
+}
+
+.opc-agent-avatar {
+  --opc-avatar-color: var(--opc-status-idle);
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+}
+
+.opc-agent-avatar[data-status="planning"] {
+  --opc-avatar-color: var(--opc-status-planning);
+}
+
+.opc-agent-avatar[data-status="running"],
+.opc-agent-avatar[data-status="enabled"],
+.opc-agent-avatar[data-status="connected"] {
+  --opc-avatar-color: var(--opc-status-running);
+}
+
+.opc-agent-avatar[data-status="waiting_approval"],
+.opc-agent-avatar[data-status="waiting"] {
+  --opc-avatar-color: var(--opc-status-waiting-approval);
+}
+
+.opc-agent-avatar[data-status="blocked"] {
+  --opc-avatar-color: var(--opc-status-blocked);
+}
+
+.opc-agent-avatar[data-status="failed"],
+.opc-agent-avatar[data-status="offline"] {
+  --opc-avatar-color: var(--opc-status-failed);
+}
+
+.opc-agent-avatar[data-status="completed"] {
+  --opc-avatar-color: var(--opc-status-completed);
+}
+
+.opc-agent-avatar[data-status="evolving"] {
+  --opc-avatar-color: var(--opc-status-evolving);
+}
+
+.opc-agent-avatar__orb {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  color: var(--opc-text-0);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--opc-avatar-color), transparent 60%),
+      var(--opc-glass)
+    ),
+    var(--opc-glass-card-bg);
+  border: 1px solid var(--opc-glass-border-strong);
+  border-radius: var(--opc-radius-md);
+  box-shadow: var(--opc-shadow-card);
+}
+
+.opc-agent-avatar__status {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  background: var(--opc-avatar-color);
+  border: 2px solid var(--opc-text-inverse);
+  border-radius: 999px;
+}
+
+.opc-agent-avatar[data-status="planning"] .opc-agent-avatar__status,
+.opc-agent-avatar[data-status="waiting_approval"] .opc-agent-avatar__status,
+.opc-agent-avatar[data-status="evolving"] .opc-agent-avatar__status {
+  animation: opc-breathe 1.8s var(--opc-ease-out) infinite;
+}
+
+.opc-metric-card .opc-card__content {
+  display: grid;
+  gap: 0.75rem;
+  min-height: 154px;
+  padding: 1.15rem;
+}
+
+.opc-metric-card__topline,
+.opc-metric-card__footer,
+.opc-skill-card__header,
+.opc-skill-card__meta,
+.opc-notification-card__title-row,
+.opc-task-timeline-item__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.opc-metric-card__topline {
+  color: var(--opc-text-1);
+  font-size: 0.82rem;
+  font-weight: 780;
+}
+
+.opc-metric-card__value {
+  color: var(--opc-text-0);
+  font-size: clamp(1.8rem, 2.5vw, 2.7rem);
+  font-weight: 820;
+  line-height: 1;
+}
+
+.opc-metric-card__footer {
+  align-self: end;
+  color: var(--opc-text-2);
+  font-size: 0.82rem;
+}
+
+.opc-metric-card__footer strong {
+  color: var(--opc-text-1);
+}
+
+.opc-connection-badge {
+  --opc-connection-color: var(--opc-status-running);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  min-height: 32px;
+  padding: 0.35rem 0.65rem;
+  color: var(--opc-text-1);
+  font-size: 0.78rem;
+  font-weight: 760;
+  background: var(--opc-glass);
+  border: 1px solid var(--opc-glass-border);
+  border-radius: var(--opc-radius-xs);
+  box-shadow: var(--opc-shadow-card);
+}
+
+.opc-connection-badge svg {
+  color: var(--opc-connection-color);
+}
+
+.opc-connection-badge[data-state="reconnecting"] {
+  --opc-connection-color: var(--opc-status-waiting-approval);
+}
+
+.opc-connection-badge[data-state="offline"] {
+  --opc-connection-color: var(--opc-status-failed);
+}
+
+.opc-notification-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.8rem;
+  padding: 0.85rem;
+  background: var(--opc-glass-soft);
+  border: 1px solid var(--opc-glass-border);
+  border-radius: var(--opc-radius-md);
+}
+
+.opc-notification-card__icon {
+  --opc-notification-color: var(--opc-info);
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: var(--opc-notification-color);
+  background: color-mix(in srgb, var(--opc-notification-color), transparent 82%);
+  border-radius: var(--opc-radius-xs);
+}
+
+.opc-notification-card__icon[data-severity="success"] {
+  --opc-notification-color: var(--opc-success);
+}
+
+.opc-notification-card__icon[data-severity="warning"] {
+  --opc-notification-color: var(--opc-warning);
+}
+
+.opc-notification-card__icon[data-severity="danger"] {
+  --opc-notification-color: var(--opc-danger);
+}
+
+.opc-notification-card__body {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.opc-notification-card strong,
+.opc-skill-card strong {
+  color: var(--opc-text-0);
+  font-size: 0.92rem;
+}
+
+.opc-notification-card p,
+.opc-skill-card p {
+  margin: 0;
+  color: var(--opc-text-1);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.opc-risk-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 24px;
+  color: var(--opc-text-0);
+  font-size: 0.72rem;
+  font-weight: 820;
+  background: var(--opc-lemon-soft);
+  border: 1px solid var(--opc-glass-border);
+  border-radius: var(--opc-radius-xs);
+}
+
+.opc-skill-card .opc-card__content {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.opc-skill-card__meta {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  color: var(--opc-text-2);
+  font-size: 0.78rem;
+}
+
+.opc-task-timeline-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  width: 100%;
+  gap: 0.85rem;
+  padding: 0.82rem;
+  color: var(--opc-text-0);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: var(--opc-glass-soft);
+  border: 1px solid var(--opc-glass-border);
+  border-radius: var(--opc-radius-md);
+  transition:
+    transform var(--opc-duration-fast) var(--opc-ease-out),
+    background var(--opc-duration-fast) var(--opc-ease-out);
+}
+
+.opc-task-timeline-item:hover {
+  background: var(--opc-glass);
+  transform: translateX(3px);
+}
+
+.opc-task-timeline-item__rail {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: var(--opc-text-1);
+  background: var(--opc-sky-soft);
+  border-radius: var(--opc-radius-xs);
+}
+
+.opc-task-timeline-item__body {
+  display: grid;
+  gap: 0.42rem;
+  min-width: 0;
+}
+
+.opc-task-timeline-item__title {
+  overflow: hidden;
+  font-weight: 780;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.opc-task-timeline-item__meta {
+  justify-content: flex-start;
+  color: var(--opc-text-2);
+  font-size: 0.78rem;
+}
+
+@keyframes opc-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--opc-avatar-color), transparent 55%);
+  }
+
+  50% {
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--opc-avatar-color), transparent 86%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opc-agent-avatar__status {
+    animation: none !important;
+  }
+}
