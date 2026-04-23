@@ -11,6 +11,8 @@ import {
   MemoryStatsSchema,
   MemoryEntryListSchema,
   NotificationListSchema,
+  ObsidianStatusSchema,
+  ReviewQueueEntrySchema,
   SkillListSchema,
   SystemEventListSchema,
   SystemHealthSchema,
@@ -39,6 +41,20 @@ describe('mock data schemas', () => {
 
   it('parses notifications.json', () => {
     expect(() => NotificationListSchema.parse(readJson('data/mock/notifications.json'))).not.toThrow()
+  })
+
+  it('parses obsidian payloads', () => {
+    expect(() =>
+      ObsidianStatusSchema.parse({ connected: false, vaultName: 'Mock OPC Vault', fileCount: 12 }),
+    ).not.toThrow()
+    expect(() =>
+      ReviewQueueEntrySchema.parse({
+        title: 'Captured reference',
+        summary: 'A useful source queued for review.',
+        tags: ['knowledge'],
+        capturedAt: '2026-04-23T06:00:00.000Z',
+      }),
+    ).not.toThrow()
   })
 
   it('parses conversations.json', () => {

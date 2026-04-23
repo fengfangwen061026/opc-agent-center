@@ -13,6 +13,7 @@ const notificationTypes: NotificationType[] = [
   'skill_patch_pending',
   'skill_auto_patched',
   'memory_maintenance_report',
+  'knowledge_capture',
   'task_report',
   'evolver_error',
 ]
@@ -30,6 +31,8 @@ function leftAccent(type: Notification['type']) {
       return 'var(--opc-sky)'
     case 'memory_maintenance_report':
       return 'var(--opc-mint)'
+    case 'knowledge_capture':
+      return 'var(--opc-success)'
     case 'task_report':
       return 'var(--opc-lavender)'
     default:
@@ -128,6 +131,14 @@ function NotificationCard({
           </div>
         ) : null}
 
+        {notification.type === 'knowledge_capture' ? (
+          <div className="opc-special-block">
+            <strong>{String(notification.payload.noteTitle ?? notification.title)}</strong>
+            <span>{String(notification.payload.sourceUrl ?? 'local capture')}</span>
+            <span>{String(notification.payload.summary ?? notification.message)}</span>
+          </div>
+        ) : null}
+
         {notification.type === 'evolver_error' ? (
           <details className="opc-special-block">
             <summary>{String(notification.payload.summary ?? notification.message)}</summary>
@@ -144,6 +155,11 @@ function NotificationCard({
           {notification.type === 'memory_maintenance_report' ? (
             <LiquidButton variant="ghost">
               <Link to="/memory">查看 Memory 面板</Link>
+            </LiquidButton>
+          ) : null}
+          {notification.type === 'knowledge_capture' ? (
+            <LiquidButton variant="ghost">
+              <Link to="/knowledge?view=review-queue">打开 Review Queue</Link>
             </LiquidButton>
           ) : null}
           {notification.type === 'task_report' && notification.taskId ? (
@@ -275,7 +291,7 @@ export function NotificationCenterPage() {
           </span>
         </GlassCard>
 
-        <div className="opc-notification-list">
+        <div className="opc-notification-list" data-testid="notification-list">
           {filtered.map((notification) => (
             <NotificationCard
               key={notification.id}

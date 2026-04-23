@@ -500,7 +500,7 @@ export class MockOpenClawAdapter implements OpenClawAdapter {
     }, 3000)
   }
 
-  private emit(event: SystemEvent) {
+  protected emit(event: SystemEvent) {
     for (const handler of this.handlers) {
       handler(event)
     }

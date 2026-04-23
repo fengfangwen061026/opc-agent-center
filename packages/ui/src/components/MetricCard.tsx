@@ -24,6 +24,7 @@ export function MetricCard({
     <GlassCard
       className={cx('opc-metric-card', className)}
       style={{ '--opc-metric-accent': accentColor, ...style } as CSSProperties}
+      data-testid="metric-card"
       {...props}
     >
       <div className="opc-metric-card__bar" />

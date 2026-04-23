@@ -27,7 +27,7 @@ export function MemorySidebar() {
   const tags = tagCounts(entries)
 
   return (
-    <GlassCard className="opc-memory-sidebar" variant="strong">
+    <GlassCard className="opc-memory-sidebar" variant="strong" data-testid="memory-sidebar">
       <div>
         <p className="opc-eyebrow">LanceDB</p>
         <h1 className="opc-section-title">Memory</h1>

@@ -214,5 +214,24 @@
     "taskId": "task-005",
     "payload": { "queueSize": 2 },
     "actions": [{ "id": "open-queue", "label": "查看队列", "variant": "ghost" }]
+  },
+  {
+    "id": "notif-013",
+    "type": "knowledge_capture",
+    "title": "OpenClaw Gateway reference captured",
+    "message": "A configuration reference was added to the Review Queue for later curation.",
+    "severity": "success",
+    "status": "unread",
+    "priority": "medium",
+    "read": false,
+    "actionRequired": false,
+    "createdAt": "2026-04-23T08:30:00.000Z",
+    "agentId": "agent-knowledge-curator",
+    "payload": {
+      "noteTitle": "OpenClaw Gateway configuration reference",
+      "sourceUrl": "https://docs.openclaw.ai/gateway/configuration",
+      "summary": "Config is stored in ~/.openclaw/openclaw.json and can be edited via CLI or Control UI."
+    },
+    "actions": [{ "id": "open-review-queue", "label": "打开 Review Queue", "variant": "ghost" }]
   }
 ]

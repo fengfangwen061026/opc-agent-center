@@ -3,6 +3,7 @@ import { cors } from 'hono/cors'
 import type { BridgeMode } from '@opc/core'
 import type { EvolverAdapter } from './adapters/EvolverAdapter'
 import type { LanceDBAdapter } from './adapters/LanceDBAdapter'
+import type { ObsidianAdapter } from './adapters/ObsidianAdapter'
 import type { OpenClawAdapter } from './adapters/OpenClawAdapter'
 import { sanitizeLog } from './env'
 import { registerAgentRoutes } from './routes/agents'
@@ -11,6 +12,7 @@ import { registerEvolverRoutes } from './routes/evolver'
 import { registerHealthRoutes } from './routes/health'
 import { registerMemoryRoutes } from './routes/memory'
 import { registerNotificationRoutes } from './routes/notifications'
+import { registerObsidianRoutes } from './routes/obsidian'
 import { registerSkillRoutes } from './routes/skills'
 import { registerTaskRoutes } from './routes/tasks'
 
@@ -18,6 +20,7 @@ export interface AppContext {
   adapter: OpenClawAdapter
   memoryAdapter: LanceDBAdapter
   evolverAdapter: EvolverAdapter
+  obsidianAdapter: ObsidianAdapter
   mode: BridgeMode
 }
 
@@ -65,6 +68,7 @@ export function createApp(context: AppContext) {
   registerConversationRoutes(app, context)
   registerMemoryRoutes(app, context)
   registerEvolverRoutes(app, context)
+  registerObsidianRoutes(app, context)
 
   app.get('/', (c) => c.json(envelope({ ok: true, service: 'opc-bridge' }, context.mode)))
 

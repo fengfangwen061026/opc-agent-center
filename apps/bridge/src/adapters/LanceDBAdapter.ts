@@ -34,6 +34,7 @@ export interface MemoryUpdatePatch {
 
 export interface LanceDBAdapter {
   connect(config: LanceDBConfig): Promise<void>
+  isConnected(): boolean
   disconnect(): Promise<void>
   status(): Promise<LanceDBStatus>
   create(entry: Omit<MemoryEntry, 'id' | 'created_at' | 'updated_at'>): Promise<MemoryEntry>

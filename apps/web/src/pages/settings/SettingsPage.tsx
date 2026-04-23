@@ -99,7 +99,7 @@ export function SettingsPage() {
           <ConnectionBadge label="Gateway" status={health.gateway.status} />
           <ConnectionBadge label={`LanceDB ${health.lancedb.totalEntries}`} status={health.lancedb.connected ? 'connected' : 'disconnected'} />
           <ConnectionBadge label="Ollama" status={health.ollama.status} />
-          <ConnectionBadge label="Obsidian" status={health.obsidian.status} />
+          <ConnectionBadge label={`Obsidian ${health.obsidian.fileCount}`} status={health.obsidian.connected ? 'connected' : 'disconnected'} />
           <ConnectionBadge label="Evolver" status={mapEvolverStatus(health.evolver.status)} />
         </div>
       </GlassCard>

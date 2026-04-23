@@ -46,7 +46,17 @@ opc-agent-center/
 
 ## 当前阶段
 
-**Phase 0**（进行中）
+**全部 Phase 0-10 验收通过，真实系统接入完成。**
+
+运行环境：
+- OpenClaw Gateway: live，ws://127.0.0.1:18789
+- Ollama: 运行中，embedding 模型已自动探测
+- LanceDB: `LANCEDB_MODE=real` 可用（embedded，~/.openclaw/memory/lancedb）
+- Obsidian: MockAdapter（需安装 Local REST API 插件）
+- Evolver: MockAdapter（OpenClaw sub-agent 配置 TODO）
+
+启动命令（完整 live 模式，`OPENCLAW_TOKEN` 需由 shell/session 安全注入）：
+`OPENCLAW_MODE=live LANCEDB_MODE=real pnpm dev`
 
 ## 执行指令
 

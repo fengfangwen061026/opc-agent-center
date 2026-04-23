@@ -4,11 +4,12 @@ import { envelope } from '../server'
 
 export function registerHealthRoutes(app: Hono, context: AppContext) {
   app.get('/api/health', async (c) => {
-    const [baseHealth, lancedb, memoryStats, evolver] = await Promise.all([
+    const [baseHealth, lancedb, memoryStats, evolver, obsidian] = await Promise.all([
       context.adapter.getStatus(),
       context.memoryAdapter.status(),
       context.memoryAdapter.getStats(),
       context.evolverAdapter.getStatus(),
+      context.obsidianAdapter.status(),
     ])
     const now = new Date().toISOString()
     const health = {
@@ -37,6 +38,7 @@ export function registerHealthRoutes(app: Hono, context: AppContext) {
         pendingPatches: evolver.pendingPatches,
         weeklyAutoPatches: evolver.weeklyAutoPatches,
       },
+      obsidian,
       memory: {
         totalEntries: memoryStats.total,
         episodic: memoryStats.byType.episodic,

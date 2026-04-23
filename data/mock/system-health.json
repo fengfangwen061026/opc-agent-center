@@ -22,12 +22,9 @@
     "message": "Embedding fallback ready"
   },
   "obsidian": {
-    "status": "idle",
-    "endpoint": "http://127.0.0.1:27123",
-    "latencyMs": 31,
-    "version": "local-rest-mock",
-    "lastCheckedAt": "2026-04-23T06:58:00.000Z",
-    "message": "Vault sync queue empty"
+    "connected": false,
+    "vaultName": "Mock OPC Vault",
+    "fileCount": 12
   },
   "evolver": {
     "status": "idle",

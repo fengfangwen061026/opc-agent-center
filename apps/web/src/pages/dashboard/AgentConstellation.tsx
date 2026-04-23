@@ -158,7 +158,7 @@ function buildAgentNodes(agents: Agent[], health: SystemHealth): Array<Node<Grap
         subtitle: 'Knowledge vault',
         accentColor: 'var(--opc-lemon)',
         avatarType: 'knowledge',
-        status: health.obsidian.status,
+        status: health.obsidian.connected ? 'connected' : 'disconnected',
       },
     },
   ]

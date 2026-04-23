@@ -1,24 +1,46 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
+import type { ReactNode } from 'react'
 import type { EvolverEvent } from '@opc/core'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { PageLoader } from '@/components/PageLoader'
 import { AppShell } from '@/layouts/AppShell'
-import { PlaceholderPage } from '@/pages/PlaceholderPage'
-import { ChatPage } from '@/pages/chat/ChatPage'
-import { CommandCenterPage } from '@/pages/CommandCenterPage'
-import { MemoryPage } from '@/pages/memory/MemoryPage'
-import { NotificationCenterPage } from '@/pages/notifications/NotificationCenterPage'
-import { SettingsPage } from '@/pages/settings/SettingsPage'
-import { SkillCenterPage } from '@/pages/skills/SkillCenterPage'
-import { SkillDetailPage } from '@/pages/skills/SkillDetailPage'
 import { useAgentStore } from '@/stores/agentStore'
 import { useConversationStore } from '@/stores/conversationStore'
 import { useEventStore } from '@/stores/eventStore'
 import { useEvolverStore } from '@/stores/evolverStore'
 import { useMemoryStore } from '@/stores/memoryStore'
 import { useNotificationStore } from '@/stores/notificationStore'
+import { useObsidianStore } from '@/stores/obsidianStore'
 import { useSkillStore } from '@/stores/skillStore'
 import { useSystemHealthStore } from '@/stores/systemHealthStore'
 import { useTaskStore } from '@/stores/taskStore'
+
+const ChatPage = lazy(() => import('@/pages/chat/ChatPage').then((module) => ({ default: module.ChatPage })))
+const CommandCenterPage = lazy(() =>
+  import('@/pages/CommandCenterPage').then((module) => ({ default: module.CommandCenterPage })),
+)
+const KnowledgePage = lazy(() =>
+  import('@/pages/knowledge/KnowledgePage').then((module) => ({ default: module.KnowledgePage })),
+)
+const MemoryPage = lazy(() => import('@/pages/memory/MemoryPage').then((module) => ({ default: module.MemoryPage })))
+const NotificationCenterPage = lazy(() =>
+  import('@/pages/notifications/NotificationCenterPage').then((module) => ({ default: module.NotificationCenterPage })),
+)
+const PlaceholderPage = lazy(() =>
+  import('@/pages/PlaceholderPage').then((module) => ({ default: module.PlaceholderPage })),
+)
+const SettingsPage = lazy(() => import('@/pages/settings/SettingsPage').then((module) => ({ default: module.SettingsPage })))
+const SkillCenterPage = lazy(() =>
+  import('@/pages/skills/SkillCenterPage').then((module) => ({ default: module.SkillCenterPage })),
+)
+const SkillDetailPage = lazy(() =>
+  import('@/pages/skills/SkillDetailPage').then((module) => ({ default: module.SkillDetailPage })),
+)
+
+function page(name: string, element: ReactNode) {
+  return <ErrorBoundary name={name}>{element}</ErrorBoundary>
+}
 
 export default function App() {
   useEffect(() => {
@@ -31,6 +53,8 @@ export default function App() {
     void useMemoryStore.getState().fetchStats()
     void useEvolverStore.getState().fetchStatus()
     void useEvolverStore.getState().fetchPendingPatches()
+    void useObsidianStore.getState().fetchStatus()
+    void useObsidianStore.getState().fetchReviewQueue()
 
     const stopEvents = useEventStore.getState().subscribe()
     const stopTaskSync = useTaskStore.getState().subscribeToEvents()
@@ -62,26 +86,28 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route element={<AppShell />}>
-          <Route path="/" element={<CommandCenterPage />} />
-          <Route path="/chat" element={<ChatPage />} />
-          <Route path="/chat/unmatched" element={<ChatPage unmatched />} />
-          <Route
-            path="/agents"
-            element={<PlaceholderPage title="Agents" description="Agent management surfaces start from the dashboard graph." />}
-          />
-          <Route path="/skills" element={<SkillCenterPage />} />
-          <Route path="/skills/:name" element={<SkillDetailPage />} />
-          <Route path="/memory" element={<MemoryPage />} />
-          <Route path="/notifications" element={<NotificationCenterPage />} />
-          <Route
-            path="/knowledge"
-            element={<PlaceholderPage title="Knowledge" description="Knowledge capture remains mock-first until the Obsidian adapter lands." />}
-          />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Route>
-      </Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route element={<AppShell />}>
+            <Route path="/" element={page('Dashboard', <CommandCenterPage />)} />
+            <Route path="/chat" element={page('Chat', <ChatPage />)} />
+            <Route path="/chat/unmatched" element={page('Chat', <ChatPage unmatched />)} />
+            <Route
+              path="/agents"
+              element={page(
+                'Agents',
+                <PlaceholderPage title="Agents" description="Agent management surfaces start from the dashboard graph." />,
+              )}
+            />
+            <Route path="/skills" element={page('Skills', <SkillCenterPage />)} />
+            <Route path="/skills/:name" element={page('Skill Detail', <SkillDetailPage />)} />
+            <Route path="/memory" element={page('Memory', <MemoryPage />)} />
+            <Route path="/notifications" element={page('Notifications', <NotificationCenterPage />)} />
+            <Route path="/knowledge" element={page('Knowledge', <KnowledgePage />)} />
+            <Route path="/settings" element={page('Settings', <SettingsPage />)} />
+          </Route>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }

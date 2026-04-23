@@ -11,3 +11,5 @@ dist/
 pnpm-debug.log
 .turbo/
 coverage/
+test-results/
+playwright-report/

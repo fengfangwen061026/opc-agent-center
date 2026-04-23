@@ -57,12 +57,12 @@ export function CommandCenterPage() {
       return {
         title: 'Obsidian',
         subtitle: 'Knowledge vault',
-        status: health.obsidian.status,
+        status: health.obsidian.connected ? ('connected' as const) : ('disconnected' as const),
       }
     }
 
     return undefined
-  }, [health.lancedb.connected, health.obsidian.status, selectedService])
+  }, [health.lancedb.connected, health.obsidian.connected, selectedService])
 
   const nextRun = evolverStatus?.nextRun ?? health.evolver.nextRun
   const daysUntilNextRun = nextRun
@@ -108,8 +108,8 @@ export function CommandCenterPage() {
         />
         <MetricCard
           title="Obsidian"
-          value={health.obsidian.status}
-          subtitle="482 vault files"
+          value={health.obsidian.connected ? 'connected' : 'offline'}
+          subtitle={`${health.obsidian.fileCount} vault files`}
           accentColor="var(--opc-lemon)"
           icon={<BookOpen />}
         />

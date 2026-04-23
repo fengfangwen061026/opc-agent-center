@@ -10,7 +10,11 @@ export const SystemHealthSchema = z.object({
     totalEntries: z.number(),
   }),
   ollama: ConnectionStatusSchema,
-  obsidian: ConnectionStatusSchema,
+  obsidian: z.object({
+    connected: z.boolean(),
+    vaultName: z.string().nullable(),
+    fileCount: z.number(),
+  }),
   evolver: z.object({
     status: z.enum(['idle', 'running', 'error', 'disabled']),
     lastRun: z.string().datetime().optional(),

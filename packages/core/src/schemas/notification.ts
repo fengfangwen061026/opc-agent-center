@@ -5,6 +5,7 @@ export const NotificationTypeSchema = z.enum([
   'skill_auto_patched',
   'skill_eval_complete',
   'memory_maintenance_report',
+  'knowledge_capture',
   'evolver_error',
   'task_report',
   'approval_required',

@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "node -e \"process.exit(0)\""
+    "test": "node -e \"process.exit(0)\"",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@opc/core": "workspace:*",
@@ -17,12 +18,14 @@
     "@vitejs/plugin-react": "^5.1.0",
     "@xyflow/react": "^12.9.0",
     "lucide-react": "^0.555.0",
+    "marked": "^18.0.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.6",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.21",

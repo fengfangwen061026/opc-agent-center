@@ -85,7 +85,7 @@ export function SkillCenterPage() {
         <SlidersHorizontal />
       </GlassCard>
 
-      <section className="opc-skill-grid">
+      <section className="opc-skill-grid" data-testid="skill-list">
         {filtered.map((skill) => {
           const pending = pendingBySkill[skill.id] ?? 0
           const circumference = 2 * Math.PI * 24

@@ -1537,6 +1537,275 @@ input {
   font-size: 0.82rem;
 }
 
+.opc-knowledge-page {
+  min-width: 0;
+}
+
+.opc-knowledge-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.opc-knowledge-toolbar .opc-segmented-control button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.opc-knowledge-toolbar svg {
+  width: 16px;
+  height: 16px;
+}
+
+.opc-knowledge-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.opc-vault-tree {
+  position: sticky;
+  top: 92px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.opc-vault-tree__nodes,
+.opc-review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.opc-vault-node {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--opc-radius-sm);
+  background: rgba(255, 255, 255, 0.36);
+  color: var(--opc-text-0);
+  cursor: pointer;
+  text-align: left;
+}
+
+.opc-vault-node:hover,
+.opc-vault-node.is-review {
+  background: color-mix(in srgb, var(--opc-lavender) 16%, rgba(255, 255, 255, 0.62));
+}
+
+.opc-vault-node svg {
+  width: 16px;
+  height: 16px;
+  color: var(--opc-text-2);
+}
+
+.opc-vault-node span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.opc-vault-node strong {
+  display: inline-flex;
+  min-width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--opc-lavender), var(--opc-sky));
+  color: var(--opc-text-inverse);
+  font-size: 0.72rem;
+}
+
+.opc-note-viewer,
+.opc-review-queue-panel,
+.opc-search-results {
+  min-height: 520px;
+}
+
+.opc-note-viewer__header,
+.opc-review-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.opc-note-viewer__header a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.opc-frontmatter-card {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.opc-frontmatter-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.opc-frontmatter-card span {
+  color: var(--opc-text-2);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.opc-frontmatter-card strong {
+  color: var(--opc-text-0);
+  font-size: 0.86rem;
+}
+
+.opc-markdown-body {
+  color: var(--opc-text-1);
+  line-height: 1.65;
+}
+
+.opc-markdown-body h1,
+.opc-markdown-body h2,
+.opc-markdown-body h3 {
+  color: var(--opc-text-0);
+  letter-spacing: 0;
+}
+
+.opc-markdown-body code,
+.opc-markdown-body pre {
+  border-radius: var(--opc-radius-sm);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--opc-text-0);
+}
+
+.opc-markdown-body pre {
+  overflow: auto;
+  padding: 12px;
+}
+
+.opc-review-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.opc-review-card h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.opc-review-card p {
+  margin: 0;
+  color: var(--opc-text-2);
+  line-height: 1.5;
+}
+
+.opc-search-result {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  border-radius: var(--opc-radius-md);
+  background: rgba(255, 255, 255, 0.38);
+  padding: 12px;
+  color: var(--opc-text-0);
+  cursor: pointer;
+  text-align: left;
+}
+
+.opc-search-result span {
+  color: var(--opc-text-2);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.opc-offline-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  border: 1px solid color-mix(in srgb, var(--opc-warning) 38%, transparent);
+  border-radius: var(--opc-radius-md);
+  background: color-mix(in srgb, var(--opc-warning) 18%, rgba(255, 255, 255, 0.7));
+  padding: 10px 12px;
+  color: var(--opc-text-0);
+  box-shadow: var(--opc-shadow-soft);
+  backdrop-filter: blur(18px);
+}
+
+.opc-offline-banner button {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.42);
+  color: var(--opc-text-1);
+  cursor: pointer;
+}
+
+.opc-offline-banner svg {
+  width: 16px;
+  height: 16px;
+}
+
+.opc-chat-offline {
+  margin-bottom: 10px;
+  color: var(--opc-text-1);
+}
+
+.opc-page-loader {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  background: linear-gradient(135deg, var(--opc-bg-0), var(--opc-bg-2));
+}
+
+.opc-page-loader__card {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--opc-text-0);
+}
+
+.opc-loader-spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid color-mix(in srgb, var(--opc-lavender) 22%, transparent);
+  border-top-color: var(--opc-lavender);
+  border-radius: 999px;
+  animation: opc-spin 0.8s linear infinite;
+}
+
+.opc-error-fallback {
+  max-width: 560px;
+  margin: 48px auto;
+}
+
+.opc-error-fallback .opc-page-copy {
+  overflow-wrap: anywhere;
+}
+
+@keyframes opc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @keyframes opc-eval-slide {
   from {
     transform: translateX(0);
@@ -1562,6 +1831,7 @@ input {
   .opc-chat-page,
   .opc-settings-page,
   .opc-memory-layout,
+  .opc-knowledge-layout,
   .opc-memory-page:not(.has-selection) .opc-memory-layout {
     grid-template-columns: 1fr;
   }
@@ -1571,7 +1841,8 @@ input {
   }
 
   .opc-memory-sidebar,
-  .opc-memory-detail {
+  .opc-memory-detail,
+  .opc-vault-tree {
     position: static;
   }
 

@@ -15,9 +15,11 @@ import {
 } from 'lucide-react'
 import { ConnectionBadge, GlassCard, LiquidButton, StatusPill } from '@opc/ui'
 import type { StatusPillStatus } from '@opc/ui'
+import { OfflineBanner } from '@/components/OfflineBanner'
 import { useEventStore } from '@/stores/eventStore'
 import { useEvolverStore } from '@/stores/evolverStore'
 import { useNotificationStore } from '@/stores/notificationStore'
+import { useObsidianStore } from '@/stores/obsidianStore'
 import { useSystemHealthStore } from '@/stores/systemHealthStore'
 
 const navItems = [
@@ -40,9 +42,10 @@ function mapEvolverStatus(status: 'idle' | 'running' | 'error' | 'disabled') {
 }
 
 export function AppShell() {
-  const { health, bridgeOnline } = useSystemHealthStore()
+  const { health } = useSystemHealthStore()
   const { status: evolverStatus } = useEvolverStore()
   const { notifications, approvalCount } = useNotificationStore()
+  const { reviewQueue } = useObsidianStore()
   const { events } = useEventStore()
 
   const pendingApprovalNotifications = notifications.filter((item) => item.actionRequired).slice(0, 3)
@@ -59,7 +62,11 @@ export function AppShell() {
           : 'Mock keyword recall active',
       },
       { label: 'Ollama', status: mapConnectionStatus(health.ollama.status), detail: health.ollama.message },
-      { label: 'Obsidian', status: mapConnectionStatus(health.obsidian.status), detail: health.obsidian.message },
+      {
+        label: `Obsidian ${health.obsidian.fileCount}`,
+        status: health.obsidian.connected ? 'connected' : 'disconnected',
+        detail: health.obsidian.vaultName ?? 'Mock vault cache',
+      },
       {
         label: 'Evolver',
         status: mapEvolverStatus(evolverStatus?.status ?? health.evolver.status),
@@ -76,8 +83,9 @@ export function AppShell() {
       health.lancedb.connected,
       health.lancedb.embeddingModel,
       health.lancedb.totalEntries,
-      health.obsidian.message,
-      health.obsidian.status,
+      health.obsidian.connected,
+      health.obsidian.fileCount,
+      health.obsidian.vaultName,
       health.ollama.message,
       health.ollama.status,
     ],
@@ -86,7 +94,7 @@ export function AppShell() {
   return (
     <div className="opc-app-shell">
       <div className="opc-app-bg" />
-      <header className="opc-topbar">
+      <header className="opc-topbar" data-testid="topbar">
         <div className="opc-topbar__brand">
           <div className="opc-brand-mark">
             <Shell />
@@ -115,7 +123,7 @@ export function AppShell() {
       </header>
 
       <div className="opc-shell-body">
-        <nav className="opc-leftnav" aria-label="Primary">
+        <nav className="opc-leftnav" aria-label="Primary" data-testid="left-nav">
           {navItems.map((item) => {
             const Icon = item.icon
 
@@ -134,17 +142,16 @@ export function AppShell() {
                 {item.label === 'Notifications' && approvalCount > 0 ? (
                   <span className="opc-nav-badge">{approvalCount}</span>
                 ) : null}
+                {item.label === 'Knowledge' && reviewQueue.length > 0 ? (
+                  <span className="opc-nav-badge">{reviewQueue.length}</span>
+                ) : null}
               </NavLink>
             )
           })}
         </nav>
 
         <main className="opc-main-workspace">
-          {!bridgeOnline ? (
-            <GlassCard className="opc-bridge-offline" variant="soft" padding="sm">
-              Bridge 离线，本地 mock fallback 已启用。
-            </GlassCard>
-          ) : null}
+          <OfflineBanner />
           <Outlet />
         </main>
 

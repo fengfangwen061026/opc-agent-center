@@ -6,6 +6,7 @@ import { useAgentStore } from '@/stores/agentStore'
 import { useConversationStore } from '@/stores/conversationStore'
 import { useNotificationStore } from '@/stores/notificationStore'
 import { useSkillStore } from '@/stores/skillStore'
+import { useSystemHealthStore } from '@/stores/systemHealthStore'
 import { useTaskStore } from '@/stores/taskStore'
 
 interface ChatPageProps {
@@ -75,6 +76,7 @@ export function ChatPage({ unmatched = false }: ChatPageProps) {
   const { skills } = useSkillStore()
   const { tasks } = useTaskStore()
   const { actionNotification } = useNotificationStore()
+  const { health, bridgeOnline } = useSystemHealthStore()
   const [search, setSearch] = useState('')
   const [draft, setDraft] = useState('')
   const [agentPickerOpen, setAgentPickerOpen] = useState(false)
@@ -97,7 +99,10 @@ export function ChatPage({ unmatched = false }: ChatPageProps) {
     return tasks.filter((task) => taskIds.has(task.id) || task.status === 'running').slice(0, 4)
   }, [activeMessages, tasks])
 
+  const gatewayOffline = !bridgeOnline || health.gateway.status === 'disconnected' || health.gateway.status === 'error'
+
   const submit = async () => {
+    if (gatewayOffline) return
     const content = draft.trim()
     if (!content) return
 
@@ -141,7 +146,7 @@ export function ChatPage({ unmatched = false }: ChatPageProps) {
             <small>Messages without a route</small>
           </span>
         </button>
-        <div className="opc-conversation-list">
+        <div className="opc-conversation-list" data-testid="conversation-list">
           {filteredConversations.map((conversation) => {
             const lastMessage = conversation.messages.at(-1)
             const isActive = conversation.id === activeConversation?.id
@@ -182,9 +187,15 @@ export function ChatPage({ unmatched = false }: ChatPageProps) {
           {unmatched ? <p className="opc-empty-copy">No unmatched messages in mock mode.</p> : null}
         </div>
         <div className="opc-chat-composer">
+          {gatewayOffline ? (
+            <GlassCard className="opc-chat-offline" variant="soft" padding="sm">
+              Gateway 离线，输入已暂停；Bridge 会继续尝试重连。
+            </GlassCard>
+          ) : null}
           <GlassCard className="opc-chat-composer__box" padding="sm">
             <textarea
               value={draft}
+              disabled={gatewayOffline}
               onChange={(event) => {
                 const value = event.target.value
                 setDraft(value)
@@ -197,7 +208,7 @@ export function ChatPage({ unmatched = false }: ChatPageProps) {
             <div className="opc-chat-composer__actions">
               <LiquidButton variant="ghost" icon={<AtSign />} onClick={() => setAgentPickerOpen((value) => !value)} />
               <LiquidButton variant="ghost" icon={<Slash />} onClick={() => setSkillPickerOpen((value) => !value)} />
-              <LiquidButton icon={<Send />} onClick={submit}>
+              <LiquidButton icon={<Send />} onClick={submit} disabled={gatewayOffline}>
                 Send
               </LiquidButton>
             </div>

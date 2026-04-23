@@ -92,7 +92,7 @@ export function MemoryList() {
   })
 
   return (
-    <GlassCard className="opc-memory-list-panel" variant="strong">
+    <GlassCard className="opc-memory-list-panel" variant="strong" data-testid="memory-list">
       <div className="opc-memory-toolbar">
         <div className="opc-toolbar-search">
           <Search />

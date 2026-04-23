@@ -25,6 +25,9 @@ export interface BridgeEnv {
   embeddingModel: string
   memoryAutoCapture: boolean
   memoryAutoRecall: boolean
+  lancedbMode: 'mock' | 'real'
+  obsidianApiUrl: string
+  obsidianApiKey?: string
 }
 
 export function loadEnv(): BridgeEnv {
@@ -36,11 +39,14 @@ export function loadEnv(): BridgeEnv {
     gatewayUrl: process.env.OPENCLAW_GATEWAY_URL ?? 'ws://127.0.0.1:18789',
     deviceName: process.env.OPENCLAW_DEVICE_NAME ?? 'opc-bridge',
     token: process.env.OPENCLAW_TOKEN,
-    lancedbPath: process.env.LANCEDB_PATH ?? '~/.openclaw/memory/lancedb',
+    lancedbPath: process.env.LANCEDB_DB_PATH ?? process.env.LANCEDB_PATH ?? '~/.openclaw/memory/lancedb',
     ollamaUrl: process.env.OLLAMA_URL ?? 'http://localhost:11434',
     embeddingModel: process.env.EMBEDDING_MODEL ?? 'nomic-embed-text',
     memoryAutoCapture: process.env.MEMORY_AUTO_CAPTURE !== 'false',
     memoryAutoRecall: process.env.MEMORY_AUTO_RECALL !== 'false',
+    lancedbMode: process.env.LANCEDB_MODE === 'real' ? 'real' : 'mock',
+    obsidianApiUrl: process.env.OBSIDIAN_API_URL ?? 'http://localhost:27123',
+    obsidianApiKey: process.env.OBSIDIAN_API_KEY,
   }
 }
 

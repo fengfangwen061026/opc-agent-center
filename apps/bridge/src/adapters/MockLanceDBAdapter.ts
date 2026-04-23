@@ -41,7 +41,7 @@ async function probeOllama(config: LanceDBConfig) {
 }
 
 export class MockLanceDBAdapter implements LanceDBAdapter {
-  private connected = false
+  protected connected = false
   private config: LanceDBConfig | undefined
   private ollamaReachable = false
   private embeddingModel: string | null = null
@@ -58,6 +58,10 @@ export class MockLanceDBAdapter implements LanceDBAdapter {
     this.entries = new Map(memory.map((entry) => [entry.id, entry]))
     this.evolverLog = logs.sort((left, right) => right.timestamp.localeCompare(left.timestamp))
     this.connected = true
+  }
+
+  isConnected(): boolean {
+    return this.connected
   }
 
   async disconnect(): Promise<void> {
