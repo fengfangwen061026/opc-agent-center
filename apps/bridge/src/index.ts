@@ -13,11 +13,10 @@ import { createApp } from './server'
 const env = loadEnv()
 const adapter = createOpenClawAdapter(env)
 const memoryAdapter = await createLanceDBAdapter(env)
-const evolverAdapter = createEvolverAdapter()
+const evolverAdapter = await createEvolverAdapter(env)
 const obsidianAdapter = await createObsidianAdapter(env)
 
 await adapter.connect()
-await evolverAdapter.connect()
 
 const app = createApp({
   adapter,
@@ -50,6 +49,7 @@ console.log(
     ollamaUrl: env.ollamaUrl,
     embeddingModel: env.embeddingModel,
     lancedbMode: env.lancedbMode,
+    evolverApiUrl: env.evolverApiUrl,
     obsidianMode: env.obsidianMode,
     obsidianApiUrl: env.obsidianApiUrl,
     hasToken: Boolean(env.token),

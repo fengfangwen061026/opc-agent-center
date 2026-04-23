@@ -22,6 +22,7 @@ export interface BridgeEnv {
   gatewayUrl: string
   deviceName: string
   token?: string
+  evolverApiUrl?: string
   lancedbPath: string
   ollamaUrl: string
   embeddingModel: string
@@ -69,6 +70,7 @@ export function loadEnv(): BridgeEnv {
     gatewayUrl: process.env.OPENCLAW_GATEWAY_URL ?? 'ws://127.0.0.1:18789',
     deviceName: process.env.OPENCLAW_DEVICE_NAME ?? 'opc-bridge',
     token: process.env.OPENCLAW_TOKEN ?? readOpenClawGatewayToken(),
+    evolverApiUrl: process.env.EVOLVER_API_URL,
     lancedbPath:
       process.env.LANCEDB_DB_PATH ?? process.env.LANCEDB_PATH ?? '~/.openclaw/memory/lancedb',
     ollamaUrl: process.env.OLLAMA_URL ?? 'http://localhost:11434',

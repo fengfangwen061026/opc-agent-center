@@ -8,6 +8,7 @@ import type { ObsidianAdapter } from './ObsidianAdapter'
 import type { OpenClawAdapter } from './OpenClawAdapter'
 import { MockOpenClawAdapter } from './MockOpenClawAdapter'
 import { RealLanceDBAdapter } from './RealLanceDBAdapter'
+import { RealEvolverAdapter } from './RealEvolverAdapter'
 import { RealObsidianAdapter } from './RealObsidianAdapter'
 import { WsOpenClawAdapter } from './WsOpenClawAdapter'
 
@@ -54,9 +55,25 @@ export async function createLanceDBAdapter(env: BridgeEnv): Promise<LanceDBAdapt
   return mock
 }
 
-export function createEvolverAdapter(): EvolverAdapter {
-  // TODO: Replace with an OpenClaw sub-agent backed adapter when the Evolver runtime API is available.
-  return new MockEvolverAdapter()
+export async function createEvolverAdapter(env: BridgeEnv): Promise<EvolverAdapter> {
+  if (env.mode === 'live') {
+    const adapter = new RealEvolverAdapter({
+      baseUrl: env.evolverApiUrl ?? 'http://127.0.0.1:18789',
+      token: env.token,
+    })
+
+    try {
+      await adapter.connect()
+      console.log('[evolver] real adapter connected')
+      return adapter
+    } catch (error) {
+      console.warn('[evolver] real adapter unreachable, falling back to mock', error)
+    }
+  }
+
+  const mock = new MockEvolverAdapter()
+  await mock.connect()
+  return mock
 }
 
 export async function createObsidianAdapter(env: BridgeEnv): Promise<ObsidianAdapter> {

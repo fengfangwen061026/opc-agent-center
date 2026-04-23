@@ -5,6 +5,7 @@
 个人 AI 超级中枢驾驶舱，基于 OpenClaw + Evolver + LanceDB + Obsidian 构建。
 
 **核心文档（必须先全部读完再写代码）**：
+
 1. `docs/spec.md` — 完整工程规格（架构、数据模型、接口、Phase 计划）
 2. `docs/ui_system.md` — UI 设计系统（色彩 token、组件规范、布局）
 
@@ -40,7 +41,7 @@ opc-agent-center/
 - 所有核心类型用 Zod schema + z.infer<> 双重约束
 - 所有外部 adapter 先实现 Mock，再接真实服务
 - UI 严格遵循 `docs/ui_system.md`，使用 `--opc-*` CSS variables
-- 不提交 secrets / .env / LanceDB 数据目录 / *.jsonl 归档文件
+- 不提交 secrets / .env / LanceDB 数据目录 / \*.jsonl 归档文件
 - 提交前运行 `pnpm typecheck && pnpm lint`
 - S3/S4 动作（发消息/push代码/发布/付款）必须经通知中心审批
 
@@ -48,15 +49,15 @@ opc-agent-center/
 
 **全部系统接入完成。**
 
-| 系统 | 状态 | 说明 |
-|---|---|---|
-| OpenClaw Gateway | ✅ live | ws://127.0.0.1:18789，v3 握手认证 |
-| LanceDB | ✅ real | nomic-embed-text 语义搜索，50 条初始记忆 |
-| Ollama | ✅ 运行 | nomic-embed-text + mxbai-embed-large |
-| Obsidian | ✅/🟡 | 桌面端已安装，REST API 需启动 Obsidian 后可用 |
-| WeChat | ✅ | ClawBot 官方插件，通知推送渠道 |
-| 飞书 | ✅/🟡 | lark-cli 已配置，OpenClaw channel 需确认飞书应用凭据/机器人权限 |
-| Evolver | ✅/🟡 | Skill 已注册，sub-agent 触发待验证 |
+| 系统             | 状态    | 说明                                                                       |
+| ---------------- | ------- | -------------------------------------------------------------------------- |
+| OpenClaw Gateway | ✅ live | ws://127.0.0.1:18789，v3 握手认证                                          |
+| LanceDB          | ✅ real | nomic-embed-text 语义搜索，50 条初始记忆                                   |
+| Ollama           | ✅ 运行 | nomic-embed-text + mxbai-embed-large                                       |
+| Obsidian         | ✅/🟡   | 桌面端已安装，用 scripts/start-obsidian.sh 启动；REST API 需 Obsidian 运行 |
+| WeChat           | ✅      | ClawBot 官方插件，通知推送渠道                                             |
+| 飞书             | ✅/🟡   | lark-cli 已配置，OpenClaw channel 需确认飞书应用凭据/机器人权限            |
+| Evolver          | ✅      | RealEvolverAdapter 已接入，降级到 Mock 时有日志提示                        |
 
 ## 启动命令
 
@@ -70,3 +71,6 @@ opc-agent-center/
 按 Phase 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 连续执行。
 每完成一个 Phase 输出验收 checklist，立刻进入下一个，不等确认。
 遇到阻塞（依赖不存在、外部系统不可用）用 mock/fallback 绕过并标注 TODO。
+
+- Obsidian 启动：`bash scripts/start-obsidian.sh`（需要桌面环境）
+- Evolver 接入：`OPENCLAW_MODE=live` 时自动尝试真实接入，失败自动降级
