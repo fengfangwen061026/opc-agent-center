@@ -1,0 +1,95 @@
+[
+  {
+    "id": "10000000-0000-4000-8000-000000000001",
+    "type": "merge",
+    "timestamp": "2026-04-21T19:03:00.000Z",
+    "summary": "Merged duplicate semantic memory about preferred stack.",
+    "reason": "Similarity score exceeded 0.93 and retained the higher-quality entry.",
+    "affected_ids": ["00000000-0000-4000-8000-000000000026", "00000000-0000-4000-8000-000000000027"],
+    "retained_id": "00000000-0000-4000-8000-000000000026"
+  },
+  {
+    "id": "10000000-0000-4000-8000-000000000002",
+    "type": "merge",
+    "timestamp": "2026-04-21T19:04:00.000Z",
+    "summary": "Merged duplicate episodic memory from dashboard planning.",
+    "reason": "Two task notes described the same planning step.",
+    "affected_ids": ["00000000-0000-4000-8000-000000000004", "00000000-0000-4000-8000-000000000005"],
+    "retained_id": "00000000-0000-4000-8000-000000000004"
+  },
+  {
+    "id": "10000000-0000-4000-8000-000000000003",
+    "type": "prune",
+    "timestamp": "2026-04-21T19:05:00.000Z",
+    "summary": "Archived one stale episodic memory older than 90 days.",
+    "reason": "Quality score was below 0.30 and it was not marked core.",
+    "affected_ids": ["00000000-0000-4000-8000-000000000020"]
+  },
+  {
+    "id": "10000000-0000-4000-8000-000000000004",
+    "type": "archive",
+    "timestamp": "2026-04-21T19:06:00.000Z",
+    "summary": "Archived low-signal memory bundle to weekly jsonl archive.",
+    "reason": "Retention policy requires soft delete before final purge.",
+    "affected_ids": ["00000000-0000-4000-8000-000000000021", "00000000-0000-4000-8000-000000000022"]
+  },
+  {
+    "id": "10000000-0000-4000-8000-000000000005",
+    "type": "skill_patch",
+    "timestamp": "2026-04-22T18:30:00.000Z",
+    "summary": "Prepared Code Change Capsule wording patch.",
+    "reason": "Users rejected two broad refactors due to missing risk notes.",
+    "affected_ids": ["skill-code-change"],
+    "score_before": 0.82,
+    "score_after": 0.9
+  },
+  {
+    "id": "10000000-0000-4000-8000-000000000006",
+    "type": "eval",
+    "timestamp": "2026-04-22T18:28:00.000Z",
+    "summary": "Ran four eval cases for Code Change Capsule.",
+    "reason": "Historical data was sparse for broad refactor requests.",
+    "affected_ids": ["skill-code-change"],
+    "score_before": 0.82,
+    "score_after": 0.9
+  },
+  {
+    "id": "10000000-0000-4000-8000-000000000007",
+    "type": "skill_patch",
+    "timestamp": "2026-04-22T19:05:00.000Z",
+    "summary": "Prepared Knowledge Capture frontmatter validation patch.",
+    "reason": "Vault notes were missing task backlinks in two recent runs.",
+    "affected_ids": ["skill-knowledge-capture"],
+    "score_before": 0.78,
+    "score_after": 0.87
+  },
+  {
+    "id": "10000000-0000-4000-8000-000000000008",
+    "type": "skill_patch",
+    "timestamp": "2026-04-22T20:10:00.000Z",
+    "summary": "Prepared Memory Maintenance threshold patch.",
+    "reason": "Procedural memory needs stricter duplicate handling.",
+    "affected_ids": ["skill-memory-maintenance"],
+    "score_before": 0.76,
+    "score_after": 0.86
+  },
+  {
+    "id": "10000000-0000-4000-8000-000000000009",
+    "type": "merge",
+    "timestamp": "2026-04-21T19:08:00.000Z",
+    "summary": "Merged duplicate procedural memory for lint workflow.",
+    "reason": "Both entries described the same pnpm verification sequence.",
+    "affected_ids": ["00000000-0000-4000-8000-000000000042", "00000000-0000-4000-8000-000000000043"],
+    "retained_id": "00000000-0000-4000-8000-000000000042"
+  },
+  {
+    "id": "10000000-0000-4000-8000-000000000010",
+    "type": "eval",
+    "timestamp": "2026-04-22T19:03:00.000Z",
+    "summary": "Evaluated Knowledge Capture against missing backlink cases.",
+    "reason": "Needed a stronger signal before requesting review.",
+    "affected_ids": ["skill-knowledge-capture"],
+    "score_before": 0.78,
+    "score_after": 0.87
+  }
+]

@@ -1,0 +1,52 @@
+:root {
+  /* 背景 */
+  --opc-bg-0: #f8fbff;
+  --opc-bg-1: #fff7fb;
+  --opc-bg-2: #f6f2ff;
+  --opc-bg-3: #f0fff9;
+
+  /* 玻璃 */
+  --opc-glass: rgba(255,255,255,0.58);
+  --opc-glass-strong: rgba(255,255,255,0.74);
+  --opc-glass-soft: rgba(255,255,255,0.42);
+  --opc-glass-border: rgba(255,255,255,0.72);
+  --opc-glass-border-strong: rgba(255,255,255,0.92);
+
+  /* 文字 */
+  --opc-text-0: #182033;
+  --opc-text-1: #46516a;
+  --opc-text-2: #77819a;
+  --opc-text-inverse: #ffffff;
+
+  /* 多巴胺色 */
+  --opc-sky: #6ec9ff;
+  --opc-lavender: #b9a6ff;
+  --opc-mint: #85e6c5;
+  --opc-lemon: #ffe17a;
+  --opc-coral: #ff9db0;
+  --opc-peach: #ffc6a8;
+  --opc-aqua: #9ff3ff;
+  --opc-rose: #ffb8df;
+
+  /* 语义色 */
+  --opc-success: #53d89b;
+  --opc-warning: #ffd166;
+  --opc-danger: #ff7a90;
+  --opc-info: #68bfff;
+
+  /* 阴影 */
+  --opc-shadow-soft: 0 18px 55px rgba(93,116,152,0.16);
+  --opc-shadow-card: 0 14px 40px rgba(91,107,134,0.13);
+  --opc-shadow-float: 0 24px 90px rgba(91,107,134,0.22);
+
+  /* 圆角 */
+  --opc-radius-xs: 10px;
+  --opc-radius-sm: 14px;
+  --opc-radius-md: 20px;
+  --opc-radius-lg: 28px;
+  --opc-radius-xl: 36px;
+
+  /* 模糊 */
+  --opc-blur: 26px;
+  --opc-blur-strong: 42px;
+}

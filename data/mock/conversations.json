@@ -1,0 +1,190 @@
+[
+  {
+    "id": "conv-001",
+    "title": "Dashboard build coordination",
+    "participants": ["user", "agent-conductor", "agent-codex"],
+    "createdAt": "2026-04-23T05:45:00.000Z",
+    "updatedAt": "2026-04-23T06:15:00.000Z",
+    "tags": ["dashboard", "phase-2"],
+    "messages": [
+      {
+        "id": "conv-001-msg-001",
+        "role": "user",
+        "author": "User",
+        "content": "Build the command center dashboard with the agent graph.",
+        "timestamp": "2026-04-23T05:45:00.000Z",
+        "metadata": {}
+      },
+      {
+        "id": "conv-001-msg-002",
+        "role": "agent",
+        "author": "Conductor",
+        "content": "Routing dashboard implementation to Codex with React Flow requirements.",
+        "timestamp": "2026-04-23T05:45:20.000Z",
+        "agentId": "agent-conductor",
+        "taskId": "task-003",
+        "metadata": { "route": "agent-codex" }
+      },
+      {
+        "id": "conv-001-msg-003",
+        "role": "agent",
+        "author": "Codex",
+        "content": "I will map mock agents to fixed graph nodes and add drawer selection.",
+        "timestamp": "2026-04-23T05:47:00.000Z",
+        "agentId": "agent-codex",
+        "taskId": "task-003",
+        "metadata": {}
+      },
+      {
+        "id": "conv-001-msg-004",
+        "role": "tool",
+        "author": "MockAdapter",
+        "content": "Loaded six agents and five service statuses.",
+        "timestamp": "2026-04-23T05:50:00.000Z",
+        "metadata": { "source": "data/mock" }
+      },
+      {
+        "id": "conv-001-msg-005",
+        "role": "assistant",
+        "author": "Codex",
+        "content": "Graph nodes are ready for dashboard rendering.",
+        "timestamp": "2026-04-23T06:12:00.000Z",
+        "agentId": "agent-codex",
+        "taskId": "task-003",
+        "metadata": {}
+      },
+      {
+        "id": "conv-001-msg-006",
+        "role": "system",
+        "author": "System",
+        "content": "Task timeline subscribed to mock events.",
+        "timestamp": "2026-04-23T06:15:00.000Z",
+        "metadata": {}
+      }
+    ]
+  },
+  {
+    "id": "conv-002",
+    "title": "Evolver patch review",
+    "participants": ["user", "agent-evolver", "agent-skill-worker"],
+    "createdAt": "2026-04-22T18:20:00.000Z",
+    "updatedAt": "2026-04-22T18:36:00.000Z",
+    "tags": ["evolver", "skill-patch"],
+    "messages": [
+      {
+        "id": "conv-002-msg-001",
+        "role": "agent",
+        "author": "Evolver",
+        "content": "The Code Change Capsule needs stronger risk-note wording.",
+        "timestamp": "2026-04-22T18:20:00.000Z",
+        "agentId": "agent-evolver",
+        "taskId": "task-006",
+        "metadata": {}
+      },
+      {
+        "id": "conv-002-msg-002",
+        "role": "tool",
+        "author": "Eval Generator",
+        "content": "Generated four cases with improved expected score.",
+        "timestamp": "2026-04-22T18:22:00.000Z",
+        "metadata": { "scoreBefore": 0.82, "scoreAfter": 0.9 }
+      },
+      {
+        "id": "conv-002-msg-003",
+        "role": "agent",
+        "author": "Evolver",
+        "content": "This is a logic-adjacent wording change and should be reviewed.",
+        "timestamp": "2026-04-22T18:26:00.000Z",
+        "agentId": "agent-evolver",
+        "metadata": {}
+      },
+      {
+        "id": "conv-002-msg-004",
+        "role": "agent",
+        "author": "SkillWorker",
+        "content": "Created a pending patch notification with approve and reject actions.",
+        "timestamp": "2026-04-22T18:31:00.000Z",
+        "agentId": "agent-skill-worker",
+        "metadata": { "notificationId": "notif-001" }
+      },
+      {
+        "id": "conv-002-msg-005",
+        "role": "system",
+        "author": "System",
+        "content": "Patch candidate is waiting in the review queue.",
+        "timestamp": "2026-04-22T18:34:00.000Z",
+        "metadata": {}
+      },
+      {
+        "id": "conv-002-msg-006",
+        "role": "user",
+        "author": "User",
+        "content": "Keep it pending until the dashboard review surface is ready.",
+        "timestamp": "2026-04-22T18:36:00.000Z",
+        "metadata": {}
+      }
+    ]
+  },
+  {
+    "id": "conv-003",
+    "title": "Memory maintenance report",
+    "participants": ["user", "agent-evolver", "agent-knowledge-curator"],
+    "createdAt": "2026-04-21T19:00:00.000Z",
+    "updatedAt": "2026-04-21T19:18:00.000Z",
+    "tags": ["memory", "maintenance"],
+    "messages": [
+      {
+        "id": "conv-003-msg-001",
+        "role": "system",
+        "author": "Scheduler",
+        "content": "Weekly Evolver maintenance run started.",
+        "timestamp": "2026-04-21T19:00:00.000Z",
+        "metadata": { "cron": "0 3 * * 0" }
+      },
+      {
+        "id": "conv-003-msg-002",
+        "role": "agent",
+        "author": "Evolver",
+        "content": "Scanning episodic, semantic, and procedural memory tables.",
+        "timestamp": "2026-04-21T19:03:00.000Z",
+        "agentId": "agent-evolver",
+        "metadata": {}
+      },
+      {
+        "id": "conv-003-msg-003",
+        "role": "tool",
+        "author": "LanceDB",
+        "content": "Found three duplicate pairs and four low-quality archive candidates.",
+        "timestamp": "2026-04-21T19:07:00.000Z",
+        "metadata": { "duplicatePairs": 3, "archiveCandidates": 4 }
+      },
+      {
+        "id": "conv-003-msg-004",
+        "role": "agent",
+        "author": "Evolver",
+        "content": "Core memories were excluded from all archive candidates.",
+        "timestamp": "2026-04-21T19:09:00.000Z",
+        "agentId": "agent-evolver",
+        "metadata": { "coreSkipped": 6 }
+      },
+      {
+        "id": "conv-003-msg-005",
+        "role": "agent",
+        "author": "KnowledgeCurator",
+        "content": "Maintenance summary is ready for Obsidian capture.",
+        "timestamp": "2026-04-21T19:14:00.000Z",
+        "agentId": "agent-knowledge-curator",
+        "metadata": {}
+      },
+      {
+        "id": "conv-003-msg-006",
+        "role": "assistant",
+        "author": "Evolver",
+        "content": "Report notification created with merge and archive counts.",
+        "timestamp": "2026-04-21T19:18:00.000Z",
+        "agentId": "agent-evolver",
+        "metadata": { "notificationId": "notif-005" }
+      }
+    ]
+  }
+]

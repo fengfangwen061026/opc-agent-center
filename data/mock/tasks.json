@@ -1,0 +1,206 @@
+[
+  {
+    "id": "task-001",
+    "title": "Refresh command center mock schemas",
+    "agentId": "agent-codex",
+    "skillId": "skill-code-change",
+    "status": "completed",
+    "priority": "high",
+    "progress": 100,
+    "createdAt": "2026-04-23T03:10:00.000Z",
+    "updatedAt": "2026-04-23T03:42:00.000Z",
+    "startedAt": "2026-04-23T03:12:00.000Z",
+    "completedAt": "2026-04-23T03:42:00.000Z",
+    "capsule": {
+      "goal": "Align Phase 0 schemas with the v2.0 specification.",
+      "inputs": ["docs/spec.md", "docs/ui_system.md"],
+      "plan": ["Read specs", "Create Zod schemas", "Parse mock data"],
+      "outputs": ["packages/core schemas", "schema test coverage"],
+      "risks": ["Mock drift from future adapters"],
+      "notes": "Completed with strict parse coverage."
+    }
+  },
+  {
+    "id": "task-002",
+    "title": "Route pending Evolver patch reviews",
+    "agentId": "agent-conductor",
+    "skillId": "skill-notification-approval",
+    "status": "running",
+    "priority": "critical",
+    "progress": 64,
+    "createdAt": "2026-04-23T05:55:00.000Z",
+    "updatedAt": "2026-04-23T06:58:00.000Z",
+    "startedAt": "2026-04-23T05:57:00.000Z",
+    "capsule": {
+      "goal": "Surface all review-required Evolver patches to the notification center.",
+      "inputs": ["skills.json", "notifications.json"],
+      "plan": ["Collect pending patches", "Create review cards", "Track approvals"],
+      "outputs": [],
+      "risks": ["Approval actions remain mocked"],
+      "notes": "Three patch candidates are awaiting review."
+    }
+  },
+  {
+    "id": "task-003",
+    "title": "Build dashboard Agent Constellation",
+    "agentId": "agent-codex",
+    "skillId": "skill-code-change",
+    "status": "running",
+    "priority": "high",
+    "progress": 47,
+    "createdAt": "2026-04-23T06:05:00.000Z",
+    "updatedAt": "2026-04-23T06:59:00.000Z",
+    "startedAt": "2026-04-23T06:08:00.000Z",
+    "capsule": {
+      "goal": "Render the interactive React Flow graph for the dashboard.",
+      "inputs": ["agents.json", "system-health.json"],
+      "plan": ["Map agents to nodes", "Add service nodes", "Wire drawer selection"],
+      "outputs": [],
+      "risks": ["Graph viewport must remain readable on mobile"],
+      "notes": "Mock graph positions are fixed for Phase 2."
+    }
+  },
+  {
+    "id": "task-004",
+    "title": "Inspect LanceDB duplicate memory candidates",
+    "agentId": "agent-evolver",
+    "skillId": "skill-memory-maintenance",
+    "status": "pending",
+    "priority": "medium",
+    "progress": 0,
+    "createdAt": "2026-04-23T06:12:00.000Z",
+    "updatedAt": "2026-04-23T06:12:00.000Z",
+    "capsule": {
+      "goal": "Prepare the next weekly duplicate-memory scan.",
+      "inputs": ["memory snapshot"],
+      "plan": ["Bucket by type", "Compute candidate pairs", "Skip core memories"],
+      "outputs": [],
+      "risks": ["No real embeddings in mock mode"],
+      "notes": "Scheduled for next Evolver run."
+    }
+  },
+  {
+    "id": "task-005",
+    "title": "Write Phase summary to Obsidian queue",
+    "agentId": "agent-knowledge-curator",
+    "skillId": "skill-knowledge-capture",
+    "status": "blocked",
+    "priority": "medium",
+    "progress": 30,
+    "createdAt": "2026-04-23T05:10:00.000Z",
+    "updatedAt": "2026-04-23T06:20:00.000Z",
+    "startedAt": "2026-04-23T05:12:00.000Z",
+    "blockedReason": "Waiting for local REST plugin heartbeat.",
+    "capsule": {
+      "goal": "Capture durable implementation decisions in the knowledge vault.",
+      "inputs": ["task reports", "schema changes"],
+      "plan": ["Summarize changes", "Generate frontmatter", "Queue vault write"],
+      "outputs": [],
+      "risks": ["Obsidian adapter is still mocked"],
+      "notes": "Queued write will replay when adapter connects."
+    }
+  },
+  {
+    "id": "task-006",
+    "title": "Evaluate code-change skill wording",
+    "agentId": "agent-evolver",
+    "skillId": "skill-eval-generator",
+    "status": "completed",
+    "priority": "medium",
+    "progress": 100,
+    "createdAt": "2026-04-22T18:05:00.000Z",
+    "updatedAt": "2026-04-22T18:28:00.000Z",
+    "startedAt": "2026-04-22T18:06:00.000Z",
+    "completedAt": "2026-04-22T18:28:00.000Z",
+    "capsule": {
+      "goal": "Generate eval cases for broad code refactors.",
+      "inputs": ["skill-code-change"],
+      "plan": ["Read examples", "Generate cases", "Score expected output"],
+      "outputs": ["patch-code-001"],
+      "risks": [],
+      "notes": "Suggested a review-required wording patch."
+    }
+  },
+  {
+    "id": "task-007",
+    "title": "Replay failed vault sync item",
+    "agentId": "agent-knowledge-curator",
+    "skillId": "skill-vault-sync",
+    "status": "failed",
+    "priority": "low",
+    "progress": 80,
+    "createdAt": "2026-04-22T15:54:00.000Z",
+    "updatedAt": "2026-04-22T16:21:00.000Z",
+    "startedAt": "2026-04-22T15:55:00.000Z",
+    "completedAt": "2026-04-22T16:21:00.000Z",
+    "capsule": {
+      "goal": "Replay one queued Obsidian write.",
+      "inputs": ["queue item vault-017"],
+      "plan": ["Check heartbeat", "Send note payload", "Record receipt"],
+      "outputs": ["failure report"],
+      "risks": ["Adapter offline"],
+      "notes": "Failed because the local REST plugin did not respond."
+    }
+  },
+  {
+    "id": "task-008",
+    "title": "Approve low-risk skill tag cleanup",
+    "agentId": "agent-skill-worker",
+    "skillId": "skill-notification-approval",
+    "status": "completed",
+    "priority": "low",
+    "progress": 100,
+    "createdAt": "2026-04-22T13:10:00.000Z",
+    "updatedAt": "2026-04-22T13:14:00.000Z",
+    "startedAt": "2026-04-22T13:11:00.000Z",
+    "completedAt": "2026-04-22T13:14:00.000Z",
+    "capsule": {
+      "goal": "Apply Evolver tag normalization for stable skills.",
+      "inputs": ["auto patch report"],
+      "plan": ["Verify patch type", "Apply tags", "Notify user"],
+      "outputs": ["skill_auto_patched notification"],
+      "risks": [],
+      "notes": "Auto patch only changed tags and comments."
+    }
+  },
+  {
+    "id": "task-009",
+    "title": "Collect active memory quality scores",
+    "agentId": "agent-evolver",
+    "skillId": "skill-memory-maintenance",
+    "status": "pending",
+    "priority": "medium",
+    "progress": 0,
+    "createdAt": "2026-04-23T06:40:00.000Z",
+    "updatedAt": "2026-04-23T06:40:00.000Z",
+    "capsule": {
+      "goal": "Prepare score distribution for the Memory page.",
+      "inputs": ["memory.json"],
+      "plan": ["Group by type", "Calculate average", "Expose mock summary"],
+      "outputs": [],
+      "risks": [],
+      "notes": "Waiting for dashboard work to finish."
+    }
+  },
+  {
+    "id": "task-010",
+    "title": "Run skill execution smoke batch",
+    "agentId": "agent-skill-worker",
+    "skillId": "skill-eval-generator",
+    "status": "blocked",
+    "priority": "high",
+    "progress": 20,
+    "createdAt": "2026-04-23T06:18:00.000Z",
+    "updatedAt": "2026-04-23T06:35:00.000Z",
+    "startedAt": "2026-04-23T06:20:00.000Z",
+    "blockedReason": "Requires approval before invoking review-required eval actions.",
+    "capsule": {
+      "goal": "Run smoke evals for draft skills.",
+      "inputs": ["skill-eval-generator", "skill-vault-sync"],
+      "plan": ["Build cases", "Execute skills", "Report scores"],
+      "outputs": [],
+      "risks": ["Could generate noisy eval logs"],
+      "notes": "Blocked by approval policy."
+    }
+  }
+]

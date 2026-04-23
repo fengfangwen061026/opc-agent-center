@@ -1,0 +1,47 @@
+{
+  "gateway": {
+    "status": "connected",
+    "endpoint": "ws://127.0.0.1:18789",
+    "latencyMs": 18,
+    "version": "mock-0.2.0",
+    "lastCheckedAt": "2026-04-23T06:58:00.000Z",
+    "message": "OpenClaw mock gateway active"
+  },
+  "lancedb": {
+    "status": "connected",
+    "endpoint": "http://127.0.0.1:8080/local",
+    "latencyMs": 11,
+    "version": "mock-embedded",
+    "lastCheckedAt": "2026-04-23T06:58:00.000Z",
+    "message": "50 mock memory entries available"
+  },
+  "ollama": {
+    "status": "connected",
+    "endpoint": "http://127.0.0.1:11434",
+    "latencyMs": 24,
+    "version": "nomic-embed-text",
+    "lastCheckedAt": "2026-04-23T06:58:00.000Z",
+    "message": "Embedding fallback ready"
+  },
+  "obsidian": {
+    "status": "idle",
+    "endpoint": "http://127.0.0.1:27123",
+    "latencyMs": 31,
+    "version": "local-rest-mock",
+    "lastCheckedAt": "2026-04-23T06:58:00.000Z",
+    "message": "Vault sync queue empty"
+  },
+  "evolver": {
+    "status": "idle",
+    "lastRun": "2026-04-21T19:00:00.000Z",
+    "nextRun": "2026-04-26T19:00:00.000Z",
+    "pendingPatches": 3
+  },
+  "memory": {
+    "totalEntries": 50,
+    "episodic": 25,
+    "semantic": 15,
+    "procedural": 10,
+    "lastMaintenance": "2026-04-21T19:12:00.000Z"
+  }
+}

@@ -1,0 +1,186 @@
+[
+  {
+    "id": "skill-task-router",
+    "name": "Task Router",
+    "description": "Classifies user intent and selects the best agent for execution.",
+    "status": "stable",
+    "version": "1.4.0",
+    "ownerAgentId": "agent-conductor",
+    "tags": ["routing", "orchestration"],
+    "triggerCount": 184,
+    "successRate": 0.94,
+    "healthScore": 0.93,
+    "lastRunAt": "2026-04-23T06:38:00.000Z",
+    "inputs": ["user_intent", "available_agents"],
+    "outputs": ["agent_id", "routing_reason"],
+    "evolver": { "pendingPatchCount": 0, "autoPatchCount": 1, "patches": [] }
+  },
+  {
+    "id": "skill-code-change",
+    "name": "Code Change Capsule",
+    "description": "Creates scoped implementation plans and verifies code changes.",
+    "status": "stable",
+    "version": "2.1.2",
+    "ownerAgentId": "agent-codex",
+    "tags": ["coding", "verification"],
+    "triggerCount": 96,
+    "successRate": 0.91,
+    "healthScore": 0.89,
+    "lastRunAt": "2026-04-23T06:44:00.000Z",
+    "inputs": ["repo_context", "request"],
+    "outputs": ["diff_summary", "check_results"],
+    "evolver": {
+      "pendingPatchCount": 1,
+      "autoPatchCount": 2,
+      "patches": [
+        {
+          "id": "patch-code-001",
+          "type": "review_required",
+          "status": "pending",
+          "summary": "Require explicit risk notes before running broad refactors.",
+          "reason": "Recent failed tasks had missing blast-radius notes.",
+          "createdAt": "2026-04-22T18:30:00.000Z",
+          "scoreBefore": 0.82,
+          "scoreAfter": 0.9,
+          "diff": {
+            "before": "Run implementation after reading local context.",
+            "after": "Run implementation after reading local context and recording risk notes for broad refactors."
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "skill-memory-recall",
+    "name": "Active Memory Recall",
+    "description": "Retrieves relevant LanceDB memories before agent replies.",
+    "status": "experimental",
+    "version": "0.8.0",
+    "ownerAgentId": "agent-evolver",
+    "tags": ["memory", "lancedb"],
+    "triggerCount": 71,
+    "successRate": 0.86,
+    "healthScore": 0.84,
+    "lastRunAt": "2026-04-23T05:40:00.000Z",
+    "inputs": ["message", "context_mode"],
+    "outputs": ["memory_context"],
+    "evolver": { "pendingPatchCount": 0, "autoPatchCount": 1, "patches": [] }
+  },
+  {
+    "id": "skill-knowledge-capture",
+    "name": "Knowledge Capture",
+    "description": "Extracts durable facts from completed tasks and queues Obsidian writes.",
+    "status": "stable",
+    "version": "1.2.3",
+    "ownerAgentId": "agent-knowledge-curator",
+    "tags": ["knowledge", "obsidian"],
+    "triggerCount": 113,
+    "successRate": 0.9,
+    "healthScore": 0.88,
+    "lastRunAt": "2026-04-23T06:22:00.000Z",
+    "inputs": ["task_capsule", "conversation_summary"],
+    "outputs": ["note_path", "frontmatter"],
+    "evolver": {
+      "pendingPatchCount": 1,
+      "autoPatchCount": 1,
+      "patches": [
+        {
+          "id": "patch-knowledge-001",
+          "type": "review_required",
+          "status": "pending",
+          "summary": "Add frontmatter validation for source task ids.",
+          "reason": "Two notes were created without a task backlink.",
+          "createdAt": "2026-04-22T19:05:00.000Z",
+          "scoreBefore": 0.78,
+          "scoreAfter": 0.87,
+          "diff": {
+            "before": "Write note with title, summary, and tags.",
+            "after": "Write note with title, summary, tags, and validated source task id."
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "skill-notification-approval",
+    "name": "Approval Notification",
+    "description": "Creates review notifications for S3/S4 actions and Evolver patches.",
+    "status": "stable",
+    "version": "1.0.5",
+    "ownerAgentId": "agent-conductor",
+    "tags": ["approval", "safety"],
+    "triggerCount": 58,
+    "successRate": 0.97,
+    "healthScore": 0.95,
+    "lastRunAt": "2026-04-23T06:48:00.000Z",
+    "inputs": ["action", "risk_level"],
+    "outputs": ["notification_id"],
+    "evolver": { "pendingPatchCount": 0, "autoPatchCount": 0, "patches": [] }
+  },
+  {
+    "id": "skill-memory-maintenance",
+    "name": "Memory Maintenance",
+    "description": "Merges duplicate memory and archives low-quality stale entries.",
+    "status": "experimental",
+    "version": "0.6.1",
+    "ownerAgentId": "agent-evolver",
+    "tags": ["memory", "maintenance"],
+    "triggerCount": 34,
+    "successRate": 0.82,
+    "healthScore": 0.8,
+    "lastRunAt": "2026-04-21T19:12:00.000Z",
+    "inputs": ["memory_snapshot"],
+    "outputs": ["maintenance_report"],
+    "evolver": {
+      "pendingPatchCount": 1,
+      "autoPatchCount": 3,
+      "patches": [
+        {
+          "id": "patch-memory-001",
+          "type": "review_required",
+          "status": "pending",
+          "summary": "Raise duplicate merge threshold for procedural memory.",
+          "reason": "Procedural entries with similar wording can encode different steps.",
+          "createdAt": "2026-04-22T20:10:00.000Z",
+          "scoreBefore": 0.76,
+          "scoreAfter": 0.86,
+          "diff": {
+            "before": "Merge entries when similarity > 0.92.",
+            "after": "Merge episodic/semantic when similarity > 0.92 and procedural only when similarity > 0.96."
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "skill-eval-generator",
+    "name": "Eval Generator",
+    "description": "Generates 3-5 test inputs for skills with sparse historical data.",
+    "status": "draft",
+    "version": "0.2.0",
+    "ownerAgentId": "agent-evolver",
+    "tags": ["eval", "quality"],
+    "triggerCount": 9,
+    "successRate": 0.72,
+    "healthScore": 0.68,
+    "inputs": ["skill_description", "examples"],
+    "outputs": ["eval_cases"],
+    "evolver": { "pendingPatchCount": 0, "autoPatchCount": 0, "patches": [] }
+  },
+  {
+    "id": "skill-vault-sync",
+    "name": "Vault Sync Queue",
+    "description": "Buffers Obsidian writes while the local REST plugin is unavailable.",
+    "status": "draft",
+    "version": "0.3.4",
+    "ownerAgentId": "agent-knowledge-curator",
+    "tags": ["obsidian", "fallback"],
+    "triggerCount": 17,
+    "successRate": 0.79,
+    "healthScore": 0.71,
+    "lastRunAt": "2026-04-22T16:20:00.000Z",
+    "inputs": ["note_payload"],
+    "outputs": ["queue_receipt"],
+    "evolver": { "pendingPatchCount": 0, "autoPatchCount": 1, "patches": [] }
+  }
+]

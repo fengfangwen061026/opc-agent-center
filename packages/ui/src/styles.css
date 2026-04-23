@@ -1,0 +1,312 @@
+.opc-glass-card {
+  position: relative;
+  background: var(--opc-glass);
+  backdrop-filter: blur(var(--opc-blur));
+  border: 1px solid var(--opc-glass-border);
+  border-radius: var(--opc-radius-lg);
+  box-shadow: var(--opc-shadow-card);
+  color: var(--opc-text-0);
+  overflow: hidden;
+}
+
+.opc-glass-card--strong {
+  background: var(--opc-glass-strong);
+  border-color: var(--opc-glass-border-strong);
+  box-shadow: var(--opc-shadow-float);
+}
+
+.opc-glass-card--soft {
+  background: var(--opc-glass-soft);
+  box-shadow: var(--opc-shadow-soft);
+}
+
+.opc-glass-card--interactive {
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.opc-glass-card--interactive:hover {
+  transform: translateY(-2px);
+  border-color: var(--opc-glass-border-strong);
+  box-shadow: var(--opc-shadow-float);
+}
+
+.opc-glass-card--pad-none {
+  padding: 0;
+}
+
+.opc-glass-card--pad-sm {
+  padding: 12px;
+}
+
+.opc-glass-card--pad-md {
+  padding: 18px;
+}
+
+.opc-glass-card--pad-lg {
+  padding: 24px;
+}
+
+.opc-liquid-button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--opc-glass-border);
+  border-radius: var(--opc-radius-sm);
+  padding: 0 14px;
+  color: var(--opc-text-0);
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.opc-liquid-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+}
+
+.opc-liquid-button--primary {
+  background: linear-gradient(135deg, var(--opc-lavender), var(--opc-sky));
+  color: var(--opc-text-inverse);
+  box-shadow: 0 8px 24px rgba(110, 201, 255, 0.28);
+}
+
+.opc-liquid-button--primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(185, 166, 255, 0.45);
+}
+
+.opc-liquid-button--ghost {
+  background: var(--opc-glass-soft);
+  color: var(--opc-text-1);
+}
+
+.opc-liquid-button--ghost:hover:not(:disabled) {
+  background: var(--opc-glass-strong);
+  color: var(--opc-text-0);
+}
+
+.opc-liquid-button--danger {
+  background: linear-gradient(135deg, var(--opc-coral), var(--opc-danger));
+  color: var(--opc-text-inverse);
+  box-shadow: 0 8px 28px rgba(255, 122, 144, 0.28);
+}
+
+.opc-liquid-button--danger:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(255, 122, 144, 0.38);
+}
+
+.opc-liquid-button__icon {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+}
+
+.opc-liquid-button__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.opc-status-pill {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  gap: 7px;
+  border-radius: 999px;
+  padding: 0 10px;
+  color: var(--opc-text-0);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.opc-status-pill__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.opc-status-pill--connected {
+  background: color-mix(in srgb, var(--opc-mint) 42%, transparent);
+}
+
+.opc-status-pill--disconnected {
+  background: color-mix(in srgb, var(--opc-coral) 38%, transparent);
+}
+
+.opc-status-pill--running {
+  background: color-mix(in srgb, var(--opc-sky) 42%, transparent);
+}
+
+.opc-status-pill--running .opc-status-pill__dot {
+  animation: opc-pulse 1.35s ease-in-out infinite;
+}
+
+.opc-status-pill--idle {
+  background: var(--opc-glass-soft);
+}
+
+.opc-status-pill--error {
+  background: color-mix(in srgb, var(--opc-danger) 38%, transparent);
+}
+
+.opc-metric-card {
+  min-height: 150px;
+  padding-top: 22px;
+}
+
+.opc-metric-card__bar {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(90deg, var(--opc-metric-accent), transparent);
+}
+
+.opc-metric-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.opc-metric-card__title {
+  color: var(--opc-text-1);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.opc-metric-card__icon {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--opc-radius-xs);
+  background: color-mix(in srgb, var(--opc-metric-accent) 24%, transparent);
+  color: var(--opc-text-0);
+}
+
+.opc-metric-card__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.opc-metric-card__value {
+  margin-top: 20px;
+  color: var(--opc-text-0);
+  font-size: 2rem;
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.opc-metric-card__subtitle {
+  margin-top: 10px;
+  color: var(--opc-text-2);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.opc-connection-badge {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--opc-glass-border);
+  border-radius: 999px;
+  background: var(--opc-glass-soft);
+  padding: 0 10px;
+  color: var(--opc-text-1);
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.opc-connection-badge__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--opc-text-2);
+}
+
+.opc-connection-badge--connected .opc-connection-badge__dot {
+  background: var(--opc-success);
+}
+
+.opc-connection-badge--running .opc-connection-badge__dot {
+  background: var(--opc-info);
+  animation: opc-pulse 1.25s ease-in-out infinite;
+}
+
+.opc-connection-badge--idle .opc-connection-badge__dot {
+  background: var(--opc-warning);
+}
+
+.opc-connection-badge--disconnected .opc-connection-badge__dot,
+.opc-connection-badge--error .opc-connection-badge__dot {
+  background: var(--opc-danger);
+}
+
+.opc-agent-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--opc-glass-border-strong);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.94), transparent 30%),
+    color-mix(in srgb, var(--opc-agent-accent) 34%, var(--opc-glass));
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--opc-agent-accent) 24%, transparent);
+  color: var(--opc-text-0);
+}
+
+.opc-agent-avatar--sm {
+  width: 34px;
+  height: 34px;
+}
+
+.opc-agent-avatar--md {
+  width: 46px;
+  height: 46px;
+}
+
+.opc-agent-avatar--lg {
+  width: 62px;
+  height: 62px;
+}
+
+.opc-agent-avatar svg {
+  width: 46%;
+  height: 46%;
+}
+
+@keyframes opc-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
