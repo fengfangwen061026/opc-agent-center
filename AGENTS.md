@@ -47,22 +47,31 @@ opc-agent-center/
 
 ## 当前阶段
 
-**全部系统接入完成。**
+**Phase 13 进行中**：Electron 桌面应用
 
-| 系统             | 状态    | 说明                                                                       |
-| ---------------- | ------- | -------------------------------------------------------------------------- |
-| OpenClaw Gateway | ✅ live | ws://127.0.0.1:18789，v3 握手认证                                          |
-| LanceDB          | ✅ real | nomic-embed-text 语义搜索，50 条初始记忆                                   |
-| Ollama           | ✅ 运行 | nomic-embed-text + mxbai-embed-large                                       |
-| Obsidian         | ✅/🟡   | 桌面端已安装，用 scripts/start-obsidian.sh 启动；REST API 需 Obsidian 运行 |
-| WeChat           | ✅      | ClawBot 官方插件，通知推送渠道                                             |
-| 飞书             | ✅/🟡   | lark-cli 已配置，OpenClaw channel 需确认飞书应用凭据/机器人权限            |
-| Evolver          | ✅      | RealEvolverAdapter 已接入，降级到 Mock 时有日志提示                        |
+| 系统              | 状态    | 说明                                                                       |
+| ----------------- | ------- | -------------------------------------------------------------------------- |
+| OpenClaw Gateway  | ✅ live | ws://127.0.0.1:18789，v3 握手认证                                          |
+| LanceDB           | ✅ real | nomic-embed-text 语义搜索，50 条初始记忆                                   |
+| Ollama            | ✅ 运行 | nomic-embed-text + mxbai-embed-large                                       |
+| Obsidian          | ✅/🟡   | 桌面端已安装，用 scripts/start-obsidian.sh 启动；REST API 需 Obsidian 运行 |
+| WeChat            | ✅      | ClawBot 官方插件，通知推送渠道                                             |
+| 飞书              | ✅/🟡   | lark-cli 已配置，OpenClaw channel 需确认飞书应用凭据/机器人权限            |
+| Evolver           | ✅      | RealEvolverAdapter 已接入，降级到 Mock 时有日志提示                        |
+| Electron 主进程   | 🟡      | apps/electron 包已创建，开发模式可用                                       |
+| Bridge 子进程管理 | 🟡      | BridgeProcess 实现，异常自动重启                                           |
+| 生产打包          | 🟡      | electron-builder 配置完成，待实机验证                                      |
 
 ## 启动命令
 
 完整 live 模式（推荐）：
 `OPENCLAW_MODE=live LANCEDB_MODE=real OBSIDIAN_MODE=real pnpm dev`
+
+开发模式（Electron 窗口）：
+`pnpm electron:dev`
+
+生产打包：
+`pnpm build && pnpm electron:build`
 
 注意：Obsidian REST API 需要先启动 Obsidian 桌面端才可用。
 

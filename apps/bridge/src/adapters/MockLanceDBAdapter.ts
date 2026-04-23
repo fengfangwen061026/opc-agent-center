@@ -12,7 +12,7 @@ import type {
 } from './LanceDBAdapter'
 
 const repoRoot = resolve(process.cwd(), '../..')
-const mockRoot = resolve(repoRoot, 'data/mock')
+const mockRoot = process.env.OPC_MOCK_ROOT ?? resolve(repoRoot, 'data/mock')
 const memoryTypes: MemoryType[] = ['episodic', 'semantic', 'procedural']
 
 async function readMock<T>(fileName: string): Promise<T> {
@@ -33,7 +33,9 @@ async function probeOllama(config: LanceDBConfig) {
     }
     const payload = (await response.json()) as { models?: Array<{ name?: string }> }
     const models = payload.models?.map((model) => model.name).filter(Boolean) ?? []
-    const hasModel = models.some((model) => model === config.embeddingModel || model === `${config.embeddingModel}:latest`)
+    const hasModel = models.some(
+      (model) => model === config.embeddingModel || model === `${config.embeddingModel}:latest`,
+    )
     return { reachable: true, model: hasModel ? config.embeddingModel : null }
   } catch {
     return { reachable: false, model: null as string | null }
@@ -104,7 +106,8 @@ export class MockLanceDBAdapter implements LanceDBAdapter {
     const next: MemoryEntry = {
       ...current,
       ...patch,
-      archived_at: patch.archived_at === null ? undefined : (patch.archived_at ?? current.archived_at),
+      archived_at:
+        patch.archived_at === null ? undefined : (patch.archived_at ?? current.archived_at),
       updated_at: nowIso(),
     }
     this.entries.set(id, next)
@@ -161,7 +164,10 @@ export class MockLanceDBAdapter implements LanceDBAdapter {
       .map((item) => item.entry)
   }
 
-  async getEvolverLog(page: number, pageSize: number): Promise<{ entries: EvolverLogEntry[]; total: number }> {
+  async getEvolverLog(
+    page: number,
+    pageSize: number,
+  ): Promise<{ entries: EvolverLogEntry[]; total: number }> {
     const start = (Math.max(1, page) - 1) * pageSize
     return {
       entries: this.evolverLog.slice(start, start + pageSize),
@@ -203,7 +209,10 @@ export class MockLanceDBAdapter implements LanceDBAdapter {
       byType,
       archived: all.length - active.length,
       core: active.filter((entry) => entry.is_core).length,
-      lastUpdated: all.reduce((latest, entry) => (entry.updated_at > latest ? entry.updated_at : latest), nowIso()),
+      lastUpdated: all.reduce(
+        (latest, entry) => (entry.updated_at > latest ? entry.updated_at : latest),
+        nowIso(),
+      ),
     })
   }
 }

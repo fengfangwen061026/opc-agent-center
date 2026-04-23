@@ -30,7 +30,7 @@ import {
 import type { OpenClawAdapter } from './OpenClawAdapter'
 
 const repoRoot = resolve(process.cwd(), '../..')
-const mockRoot = resolve(repoRoot, 'data/mock')
+const mockRoot = process.env.OPC_MOCK_ROOT ?? resolve(repoRoot, 'data/mock')
 
 async function readMock<T>(fileName: string): Promise<T> {
   return JSON.parse(await readFile(resolve(mockRoot, fileName), 'utf8')) as T
@@ -75,7 +75,8 @@ function createEvalResult(skillId: string, score = 0.84): SkillEvalResult {
         input: 'Ambiguous request that needs clarification',
         expected: 'Asks a concise clarifying question',
         passed: score > 0.72,
-        judgeComment: score > 0.72 ? 'Handled ambiguity cleanly.' : 'Needs stronger clarification behavior.',
+        judgeComment:
+          score > 0.72 ? 'Handled ambiguity cleanly.' : 'Needs stronger clarification behavior.',
       },
       {
         id: `${skillId}-case-3`,
@@ -125,7 +126,10 @@ export class MockOpenClawAdapter implements OpenClawAdapter {
                   step: 'Execute assigned plan',
                   tool: 'mock.agent',
                   parameters: { agentId: task.agentId },
-                  result: task.status === 'failed' ? 'Execution failed in mock adapter' : 'Execution step completed',
+                  result:
+                    task.status === 'failed'
+                      ? 'Execution failed in mock adapter'
+                      : 'Execution step completed',
                   durationMs: 620 + index * 19,
                   timestamp: task.updatedAt,
                 },
@@ -148,34 +152,46 @@ export class MockOpenClawAdapter implements OpenClawAdapter {
           (index % 2 === 0
             ? {
                 score: Math.max(0.62, 0.92 - index * 0.03),
-                suggestions: ['Keep task scope explicit', 'Record approval boundary when actions escalate'],
+                suggestions: [
+                  'Keep task scope explicit',
+                  'Record approval boundary when actions escalate',
+                ],
               }
             : undefined),
       },
     }))
     this.skills = SkillListSchema.parse(await readMock('skills.json'))
     this.notifications = NotificationListSchema.parse(await readMock('notifications.json'))
-    this.conversations = ConversationListSchema.parse(await readMock('conversations.json')).map((conversation, index) => {
-      const channel = conversation.channel === 'default' ? (index === 0 ? 'web' : index === 1 ? 'discord' : 'telegram') : conversation.channel
+    this.conversations = ConversationListSchema.parse(await readMock('conversations.json')).map(
+      (conversation, index) => {
+        const channel =
+          conversation.channel === 'default'
+            ? index === 0
+              ? 'web'
+              : index === 1
+                ? 'discord'
+                : 'telegram'
+            : conversation.channel
 
-      return {
-        ...conversation,
-        channel,
-        unreadCount: index,
-        messages: conversation.messages.map((message, messageIndex) => ({
-          ...message,
-          channel: message.channel === 'default' ? channel : message.channel,
-          type:
-            message.role === 'tool'
-              ? 'skill_invocation'
-              : message.taskId
-                ? 'task_report'
-                : messageIndex === conversation.messages.length - 1 && index === 1
-                  ? 'approval_request'
-                  : 'text',
-        })),
-      }
-    })
+        return {
+          ...conversation,
+          channel,
+          unreadCount: index,
+          messages: conversation.messages.map((message, messageIndex) => ({
+            ...message,
+            channel: message.channel === 'default' ? channel : message.channel,
+            type:
+              message.role === 'tool'
+                ? 'skill_invocation'
+                : message.taskId
+                  ? 'task_report'
+                  : messageIndex === conversation.messages.length - 1 && index === 1
+                    ? 'approval_request'
+                    : 'text',
+          })),
+        }
+      },
+    )
     this.events = SystemEventListSchema.parse(await readMock('events.json'))
     this.connected = true
     this.startEventPump()
@@ -212,7 +228,10 @@ export class MockOpenClawAdapter implements OpenClawAdapter {
       evolver: {
         ...skill.evolver,
         pendingPatchCount: this.notifications.filter(
-          (item) => item.type === 'skill_patch_pending' && item.skillId === skill.id && item.status !== 'done',
+          (item) =>
+            item.type === 'skill_patch_pending' &&
+            item.skillId === skill.id &&
+            item.status !== 'done',
         ).length,
       },
     }))
@@ -305,7 +324,9 @@ export class MockOpenClawAdapter implements OpenClawAdapter {
       id: `event-skill-rollback-${Date.now()}`,
       type: 'skill.rollback',
       title: `${skill.name} rollback simulated`,
-      message: patchId ? `Rolled back to ${patchId} in mock mode.` : 'Rollback simulated in mock mode.',
+      message: patchId
+        ? `Rolled back to ${patchId} in mock mode.`
+        : 'Rollback simulated in mock mode.',
       level: 'info',
       source: 'bridge',
       timestamp: nowIso(),
@@ -337,8 +358,16 @@ export class MockOpenClawAdapter implements OpenClawAdapter {
       return {
         ...notification,
         read: true,
-        actionRequired: action === 'reject' || action === 'approve' || action === 'archive' ? false : notification.actionRequired,
-        status: action === 'reject' || action === 'archive' ? 'dismissed' : action === 'approve' ? 'done' : 'read',
+        actionRequired:
+          action === 'reject' || action === 'approve' || action === 'archive'
+            ? false
+            : notification.actionRequired,
+        status:
+          action === 'reject' || action === 'archive'
+            ? 'dismissed'
+            : action === 'approve'
+              ? 'done'
+              : 'read',
       }
     })
 
@@ -407,7 +436,9 @@ export class MockOpenClawAdapter implements OpenClawAdapter {
         channel,
         timestamp: nowIso(),
         agentId: input.agentId ?? 'agent-conductor',
-        metadata: input.content.includes('/skill') ? { skillName: 'Mock Skill', parameters: 'parsed from input' } : {},
+        metadata: input.content.includes('/skill')
+          ? { skillName: 'Mock Skill', parameters: 'parsed from input' }
+          : {},
       }
       this.appendMessage(conversation.id, reply, true)
       this.emitChatMessage(conversation.id, reply)

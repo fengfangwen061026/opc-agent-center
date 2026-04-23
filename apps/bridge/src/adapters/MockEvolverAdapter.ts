@@ -5,7 +5,7 @@ import { EvolverStatusSchema, SkillListSchema } from '@opc/core'
 import type { EvolverAdapter } from './EvolverAdapter'
 
 const repoRoot = resolve(process.cwd(), '../..')
-const mockRoot = resolve(repoRoot, 'data/mock')
+const mockRoot = process.env.OPC_MOCK_ROOT ?? resolve(repoRoot, 'data/mock')
 
 async function readMock<T>(fileName: string): Promise<T> {
   return JSON.parse(await readFile(resolve(mockRoot, fileName), 'utf8')) as T
@@ -57,7 +57,9 @@ export class MockEvolverAdapter implements EvolverAdapter {
   }
 
   async getPendingPatches(): Promise<SkillPatch[]> {
-    return this.skills.flatMap((skill) => skill.evolver.patches.filter((patch) => patch.status === 'pending'))
+    return this.skills.flatMap((skill) =>
+      skill.evolver.patches.filter((patch) => patch.status === 'pending'),
+    )
   }
 
   async approvePatch(skillName: string, patchId: string): Promise<void> {
@@ -101,7 +103,11 @@ export class MockEvolverAdapter implements EvolverAdapter {
   private updatePatch(skillName: string, patchId: string, status: SkillPatch['status']) {
     const decoded = decodeURIComponent(skillName)
     this.skills = this.skills.map((skill) => {
-      if (skill.id !== decoded && skill.name !== decoded && skill.name.toLowerCase().replaceAll(' ', '-') !== decoded) {
+      if (
+        skill.id !== decoded &&
+        skill.name !== decoded &&
+        skill.name.toLowerCase().replaceAll(' ', '-') !== decoded
+      ) {
         return skill
       }
 
@@ -145,7 +151,9 @@ export class MockEvolverAdapter implements EvolverAdapter {
       }
 
       if (this.eventIndex % 3 === 2) {
-        const skill = this.skills.find((item) => item.evolver.patches.some((patch) => patch.status === 'pending'))
+        const skill = this.skills.find((item) =>
+          item.evolver.patches.some((patch) => patch.status === 'pending'),
+        )
         const patch = skill?.evolver.patches.find((item) => item.status === 'pending')
         if (skill && patch) {
           this.emit({ type: 'skill.patch.submitted', skillName: skill.id, patch })

@@ -35,13 +35,13 @@ OpenClaw 负责执行编排，Evolver 负责系统进化，Obsidian 是知识库
 
 ### 2.1 外部系统依赖
 
-| 系统 | 角色 | 接入方式 | 离线降级 |
-|---|---|---|---|
-| OpenClaw Gateway | 执行中枢 | WebSocket ws://127.0.0.1:18789 | MockAdapter |
-| LanceDB | 本地向量记忆库 | HTTP :8080 或 embedded | 内存临时存储 |
-| Ollama | Embedding 模型 | HTTP :11434 | 关闭 auto-recall |
-| Obsidian | 知识库 | Local REST Plugin :27123 | 写入本地队列 |
-| Evolver | 进化 sub-agent | OpenClaw sub-agent API | 禁用进化功能 |
+| 系统             | 角色           | 接入方式                       | 离线降级         |
+| ---------------- | -------------- | ------------------------------ | ---------------- |
+| OpenClaw Gateway | 执行中枢       | WebSocket ws://127.0.0.1:18789 | MockAdapter      |
+| LanceDB          | 本地向量记忆库 | HTTP :8080 或 embedded         | 内存临时存储     |
+| Ollama           | Embedding 模型 | HTTP :11434                    | 关闭 auto-recall |
+| Obsidian         | 知识库         | Local REST Plugin :27123       | 写入本地队列     |
+| Evolver          | 进化 sub-agent | OpenClaw sub-agent API         | 禁用进化功能     |
 
 ---
 
@@ -50,12 +50,14 @@ OpenClaw 负责执行编排，Evolver 负责系统进化，Obsidian 是知识库
 ### 3.1 两层分工
 
 **Layer 1: Active Memory Plugin（pre-reply 触发）**
+
 - 每次主 agent 回复前自动运行
 - 从 LanceDB 拉取语义相关记忆，注入系统 context
 - 支持三种 context 模式：message（默认）/ recent / full
 - 配置路径：`~/.openclaw/openclaw.json` → `plugins.slots.memory`
 
 **Layer 2: LanceDB 本地向量库（持久化存储）**
+
 - Embedding 模型：nomic-embed-text（Ollama 本地运行）
 - 模型拉取：`ollama pull nomic-embed-text`
 - LanceDB 数据目录：`~/.openclaw/memory/lancedb/`
@@ -66,26 +68,26 @@ OpenClaw 负责执行编排，Evolver 负责系统进化，Obsidian 是知识库
 // packages/core/src/schemas/memory.ts
 
 export const MemoryTypeSchema = z.enum([
-  'episodic',    // 对话片段，事件记录
-  'semantic',    // 提炼的事实、偏好、知识
-  'procedural',  // Skill 使用经验
-]);
+  'episodic', // 对话片段，事件记录
+  'semantic', // 提炼的事实、偏好、知识
+  'procedural', // Skill 使用经验
+])
 
 export const MemoryEntrySchema = z.object({
   id: z.string().uuid(),
   content: z.string(),
   type: MemoryTypeSchema,
   tags: z.array(z.string()),
-  source: z.string(),           // 来源 skill id 或 conversation id
+  source: z.string(), // 来源 skill id 或 conversation id
   created_at: z.string().datetime(),
   updated_at: z.string().datetime(),
-  quality_score: z.number().min(0).max(1),  // Evolver 维护
-  is_core: z.boolean().default(false),      // 用户标记为核心，不被自动删除
+  quality_score: z.number().min(0).max(1), // Evolver 维护
+  is_core: z.boolean().default(false), // 用户标记为核心，不被自动删除
   merged_from: z.array(z.string()).optional(), // 合并来源 id 列表
   archived_at: z.string().datetime().optional(), // 软删除时间
-});
+})
 
-export type MemoryEntry = z.infer<typeof MemoryEntrySchema>;
+export type MemoryEntry = z.infer<typeof MemoryEntrySchema>
 ```
 
 ### 3.3 LanceDB 表结构
@@ -161,18 +163,18 @@ model: claude-opus-4-5
 triggers:
   - type: event
     event: skill.execution.completed
-    condition: "executionCount >= 10 OR failureRate > 0.2"
+    condition: 'executionCount >= 10 OR failureRate > 0.2'
   - type: event
     event: task.rejected_by_user
   - type: cron
-    schedule: "0 3 * * 0"   # 每周日凌晨 3 点
-  - type: manual             # 前端手动触发
+    schedule: '0 3 * * 0' # 每周日凌晨 3 点
+  - type: manual # 前端手动触发
 workspace: ~/.openclaw/evolver/
 subagent:
   maxSpawnDepth: 1
 permissions:
   memory_write: true
-  memory_delete: true        # 软删除，归档而非物理删除
+  memory_delete: true # 软删除，归档而非物理删除
   notification_create: true
   skill_patch_auto:
     - description
@@ -194,17 +196,20 @@ permissions:
 Evolver 评估 Skill 质量时结合两种方式：
 
 **方式 A：历史任务结果评分**
+
 - 数据来源：OpenClaw task log
 - 信号：用户接受率、任务完成率、重试次数、用户否决记录
 - 计算：`quality_score = (accepted / total) * 0.6 + (no_retry / total) * 0.4`
 
 **方式 B：Evolver 生成测试用例**
+
 - Evolver 读取 Skill 的 `description` 和 `examples`
 - 生成 3-5 个测试 input，调用 Skill，对照预期 output 评分
 - 使用 Opus 模型作为 judge
 
 **综合评分**：`final_score = A * 0.6 + B * 0.4`
-- 历史数据不足 5 条时，权重调整为 A * 0.2 + B * 0.8
+
+- 历史数据不足 5 条时，权重调整为 A _ 0.2 + B _ 0.8
 
 ### 4.5 Skill Patch 流程
 
@@ -233,6 +238,7 @@ Evolver 检测到优化点
 **触发**：每周 cron，或 memory 总量超过阈值（默认 10000 条）
 
 **步骤**：
+
 1. 扫描 episodic 表，找出 >90 天且 quality_score < 0.3 的条目
 2. 扫描全库，找出语义相似度 > 0.92 的重复对
 3. 对重复对：保留 quality_score 最高的，其余软删除（写入 archived_at）
@@ -300,7 +306,7 @@ export const SystemHealthSchema = z.object({
     procedural: z.number(),
     lastMaintenance: z.string().datetime().optional(),
   }),
-});
+})
 ```
 
 ---
@@ -331,6 +337,7 @@ Evolver 日志
 **Evolver 日志视图**（切换到此视图时替换主栏）：
 
 每条日志条目显示：
+
 - 操作类型（MERGE / PRUNE / ARCHIVE）
 - 时间戳
 - 涉及条目数
@@ -340,11 +347,13 @@ Evolver 日志
 ### 6.2 Skill Center（/skills）增强
 
 在原有 Skill 列表基础上，每个 Skill 卡片增加：
+
 - Evolver 健康评分（圆形进度，0-1）
 - 待审核 patch 徽章（橙色数字）
 - 最近自动改动记录（折叠，可展开）
 
 Skill 详情页新增 **进化历史** tab：
+
 - 时间线展示所有 patch（自动 + 审核通过）
 - 每个 patch 显示 diff + Evolver 的改动理由 + eval 分数对比
 - 支持回滚到任意历史版本
@@ -352,6 +361,7 @@ Skill 详情页新增 **进化历史** tab：
 ### 6.3 Dashboard 新增 Evolver 状态卡
 
 在原有 5 个 MetricCard 基础上新增 Evolver 卡：
+
 - 当前状态（idle/running/error）
 - 下次定时运行时间
 - 本周自动 patch 数
@@ -366,14 +376,15 @@ Skill 详情页新增 **进化历史** tab：
 ```typescript
 // packages/core/src/schemas/notification.ts 新增类型
 
-'skill_patch_pending'     // Evolver 提交逻辑变更，等待审核
-'skill_auto_patched'      // Evolver 自动应用小改动（可查看）
-'skill_eval_complete'     // eval 运行完成，附带评分报告
+'skill_patch_pending' // Evolver 提交逻辑变更，等待审核
+'skill_auto_patched' // Evolver 自动应用小改动（可查看）
+'skill_eval_complete' // eval 运行完成，附带评分报告
 'memory_maintenance_report' // 每周整理报告
-'evolver_error'           // Evolver 运行出错
+'evolver_error' // Evolver 运行出错
 ```
 
 每个 skill_patch_pending 通知包含：
+
 - skill 名称和当前版本
 - patch 摘要（一句话描述改了什么）
 - Evolver 的改动理由
@@ -385,18 +396,23 @@ Skill 详情页新增 **进化历史** tab：
 ## 8. Phase 执行计划
 
 ### Phase 0-2（已完成）
+
 脚手架、UI、Dashboard mock。
 
 ### Phase 3：OpenClaw Gateway Adapter
+
 不变，见原规格。
 
 ### Phase 4：Chat + IM
+
 不变，见原规格。
 
 ### Phase 5：Notification + 审核中心
+
 新增 skill_patch_pending / skill_auto_patched / memory_maintenance_report 类型处理。
 
 ### Phase 6：Skill Center
+
 新增 Evolver 健康评分、待审核 patch 徽章、进化历史 tab、diff 审核视图、回滚功能。
 
 ### Phase 7：LanceDB Memory 层（新）
@@ -404,17 +420,19 @@ Skill 详情页新增 **进化历史** tab：
 **目标**：建立本地向量记忆系统，替换 memory-core。
 
 **任务清单**：
+
 1. Bridge 新增 LanceDBAdapter
    - 连接 LanceDB（embedded 模式，无需独立进程）
    - 集成 Ollama nomic-embed-text embedding
    - 实现 CRUD + 语义搜索接口
 2. packages/core 新增 MemoryEntry schema
-3. Bridge 暴露 /api/memory/* 端点
+3. Bridge 暴露 /api/memory/\* 端点
 4. 前端实现 Memory 面板（三栏布局，完整操作能力）
 5. MockAdapter：内存中模拟 LanceDB，50条 mock memory 数据
 6. OpenClaw memory plugin 配置文档（docs/memory-setup.md）
 
 **验收**：
+
 - [ ] LanceDB embedded 模式在 Bridge 启动时自动初始化
 - [ ] Ollama 不可用时，auto-recall 自动关闭并在 UI 提示
 - [ ] /api/memory/search?q= 返回语义相关结果
@@ -429,6 +447,7 @@ Skill 详情页新增 **进化历史** tab：
 **目标**：Evolver sub-agent 配置，前端接入 Evolver 状态和整理日志。
 
 **任务清单**：
+
 1. Evolver SKILL.md + SOUL.md 创建（`~/.openclaw/evolver/` 或仓库 skills/evolver/）
 2. packages/core 新增 EvolverLog schema、EvolverStatus schema
 3. Bridge 新增 EvolverAdapter
@@ -441,6 +460,7 @@ Skill 详情页新增 **进化历史** tab：
 7. MockAdapter：模拟 Evolver 运行状态和日志
 
 **Evolver EvolverLog schema**：
+
 ```typescript
 export const EvolverLogEntrySchema = z.object({
   id: z.string().uuid(),
@@ -449,13 +469,14 @@ export const EvolverLogEntrySchema = z.object({
   summary: z.string(),
   reason: z.string(),
   affected_ids: z.array(z.string()),
-  retained_id: z.string().optional(),    // merge 时保留的条目
-  score_before: z.number().optional(),   // eval 前分数
-  score_after: z.number().optional(),    // eval 后分数
-});
+  retained_id: z.string().optional(), // merge 时保留的条目
+  score_before: z.number().optional(), // eval 前分数
+  score_after: z.number().optional(), // eval 后分数
+})
 ```
 
 **验收**：
+
 - [ ] Evolver SKILL.md 在仓库 skills/evolver/ 目录下
 - [ ] Dashboard Evolver 卡片显示状态和统计
 - [ ] Memory 面板可切换到 Evolver 日志视图
@@ -466,13 +487,44 @@ export const EvolverLogEntrySchema = z.object({
 - [ ] skill_patch_pending 通知包含 diff 和 eval 分数
 
 ### Phase 9：Obsidian Adapter
+
 不变，见原规格。
 
 ### Phase 10：安全打磨 + 测试
+
 新增：
+
 - LanceDB 归档文件不暴露到前端 API（只返回日志摘要）
 - Evolver 的 Ollama embedding 调用不记录 memory 内容到日志
 - Memory 面板的编辑操作需要操作确认（防误操作）
+
+### Phase 13：Electron 桌面应用（新）
+
+**目标**：将前端 + Bridge 打包成独立桌面应用，产出 .app / .exe / .AppImage。
+
+**架构决策**：
+
+- Electron 主进程负责启动 Bridge 子进程（fork）
+- Renderer 进程运行 React 前端，通过 HTTP/WebSocket 与 Bridge 通信
+- 不引入额外 IPC：通信路径与 web 模式完全相同
+- contextIsolation: true，nodeIntegration: false（安全）
+
+**任务清单**：
+
+1. 新建 apps/electron 包（主进程、preload、Bridge 进程管理）
+2. electron-builder 配置（mac dmg / win nsis / linux AppImage）
+3. 修复 apps/bridge/src/index.ts 遗留 bug（createEvolverAdapter 未传 env）
+4. 根 package.json 新增 electron:dev / electron:build / electron:pack 脚本
+5. AGENTS.md 更新
+
+**验收**：
+
+- [ ] pnpm typecheck / lint / test 全部通过
+- [ ] pnpm electron:dev 可启动（开发模式：Vite dev server + Bridge + Electron 窗口）
+- [ ] 窗口内可正常加载 OPC 驾驶舱 UI
+- [ ] 窗口关闭时 Bridge 子进程正常退出（无僵尸进程）
+- [ ] Bridge 异常退出时 Electron 自动重启（最多 3 次）
+- [ ] pnpm electron:build 无报错（需先 pnpm build 构建 web 和 bridge）
 
 ---
 

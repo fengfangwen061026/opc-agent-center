@@ -1,0 +1,46 @@
+appId: com.opc.agent-center
+productName: OPC 超级中枢
+copyright: OPC Agent Center
+
+directories:
+  output: dist-app
+  buildResources: resources
+
+files:
+  - dist/**/*
+  - node_modules/**/*
+
+extraResources:
+  - from: ../../apps/web/dist
+    to: web
+  - from: ../../apps/bridge/dist
+    to: bridge
+  - from: ../../apps/bridge/package.json
+    to: bridge/package.json
+  - from: ../../apps/bridge/node_modules
+    to: bridge/node_modules
+  - from: ../../data/mock
+    to: data/mock
+
+mac:
+  category: public.app-category.productivity
+  icon: resources/icon.png
+  target:
+    - target: dmg
+      arch: [x64, arm64]
+
+win:
+  icon: resources/icon.png
+  target:
+    - target: nsis
+      arch: [x64]
+
+linux:
+  target:
+    - target: AppImage
+      arch: [x64]
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true

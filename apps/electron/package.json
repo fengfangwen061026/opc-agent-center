@@ -1,0 +1,23 @@
+{
+  "name": "@opc/electron",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "pnpm build && electron .",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "test": "node -e \"process.exit(0)\"",
+    "electron-builder": "electron-builder"
+  },
+  "dependencies": {
+    "@opc/bridge": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "electron": "^41.3.0",
+    "electron-builder": "^26.8.1",
+    "typescript": "^5.9.3"
+  }
+}

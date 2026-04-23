@@ -9,7 +9,10 @@
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
-    "test:e2e": "pnpm --filter=./apps/web test:e2e"
+    "test:e2e": "pnpm --filter=./apps/web test:e2e",
+    "electron:dev": "pnpm --parallel --filter=./apps/web --filter=./apps/bridge dev & pnpm --filter=./apps/electron dev",
+    "electron:build": "pnpm -r build && pnpm --filter=./apps/electron electron-builder",
+    "electron:pack": "pnpm --filter=./apps/electron electron-builder --dir"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",
