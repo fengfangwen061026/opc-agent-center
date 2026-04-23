@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { RotateCcw, Save, Sparkles } from 'lucide-react'
+import { Check, RotateCcw, Save, Sparkles, X } from 'lucide-react'
 import { GlassCard, LiquidButton, StatusPill } from '@opc/ui'
+import { useEvolverStore } from '@/stores/evolverStore'
 import { useSkillStore } from '@/stores/skillStore'
 
 const tabs = ['overview', 'config', 'history', 'evolution', 'eval'] as const
@@ -20,6 +21,7 @@ export function SkillDetailPage() {
   const { name = '' } = useParams()
   const [searchParams] = useSearchParams()
   const { selectedSkill, evalResult, evalRunning, fetchSkill, updateSkill, runEval, rollbackSkill } = useSkillStore()
+  const { approvePatch, rejectPatch, triggerEval } = useEvolverStore()
   const initialTab = (searchParams.get('tab') as SkillTab | null) ?? 'overview'
   const [tab, setTab] = useState<SkillTab>(tabs.includes(initialTab) ? initialTab : 'overview')
   const configRef = useRef<HTMLTextAreaElement>(null)
@@ -163,6 +165,28 @@ export function SkillDetailPage() {
                 <p>{patch.reason}</p>
                 <p className="opc-detail-copy">Eval {patch.scoreBefore ?? '--'} → {patch.scoreAfter ?? '--'}</p>
                 <PatchDiff before={patch.diff?.before} after={patch.diff?.after} />
+                {patch.status === 'pending' ? (
+                  <div className="opc-drawer-actions">
+                    <LiquidButton
+                      icon={<Check />}
+                      onClick={() => {
+                        void approvePatch(selectedSkill.id, patch.id).then(() => fetchSkill(selectedSkill.id))
+                      }}
+                    >
+                      批准
+                    </LiquidButton>
+                    <LiquidButton
+                      variant="danger"
+                      icon={<X />}
+                      onClick={() => {
+                        const reason = window.prompt('拒绝原因（可选）') ?? undefined
+                        void rejectPatch(selectedSkill.id, patch.id, reason).then(() => fetchSkill(selectedSkill.id))
+                      }}
+                    >
+                      拒绝
+                    </LiquidButton>
+                  </div>
+                ) : null}
                 <LiquidButton
                   variant="ghost"
                   icon={<RotateCcw />}
@@ -182,7 +206,14 @@ export function SkillDetailPage() {
 
         {tab === 'eval' ? (
           <div className="opc-detail-stack">
-            <LiquidButton icon={<Sparkles />} onClick={() => void runEval(selectedSkill.id)} disabled={evalRunning}>
+            <LiquidButton
+              icon={<Sparkles />}
+              onClick={() => {
+                void triggerEval(selectedSkill.id)
+                void runEval(selectedSkill.id)
+              }}
+              disabled={evalRunning}
+            >
               {evalRunning ? 'Eval running...' : 'Run eval'}
             </LiquidButton>
             {evalRunning ? <div className="opc-eval-progress" /> : null}

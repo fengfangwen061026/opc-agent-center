@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { Task } from '@opc/core'
 import {
   Bell,
@@ -15,6 +16,7 @@ import { AgentConstellation, AgentDrawerContent, ServiceDrawerContent } from '@/
 import { TaskTimeline } from '@/pages/dashboard/TaskTimeline'
 import { useAgentStore } from '@/stores/agentStore'
 import { useEventStore } from '@/stores/eventStore'
+import { useEvolverStore } from '@/stores/evolverStore'
 import { useNotificationStore } from '@/stores/notificationStore'
 import { useSystemHealthStore } from '@/stores/systemHealthStore'
 import { useTaskStore } from '@/stores/taskStore'
@@ -22,13 +24,16 @@ import { useTaskStore } from '@/stores/taskStore'
 type ServiceSelection = 'service-lancedb' | 'service-obsidian' | undefined
 
 export function CommandCenterPage() {
+  const navigate = useNavigate()
   const { agents, selectedAgentId, selectAgent, clearSelectedAgent } = useAgentStore()
   const { health } = useSystemHealthStore()
+  const { status: evolverStatus } = useEvolverStore()
   const { notifications, unreadCount, approvalCount } = useNotificationStore()
   const { events } = useEventStore()
   const { tasks } = useTaskStore()
   const [selectedTask, setSelectedTask] = useState<Task | undefined>()
   const [selectedService, setSelectedService] = useState<ServiceSelection>()
+  const [now] = useState(() => Date.now())
 
   const selectedAgent = agents.find((agent) => agent.id === selectedAgentId)
   const totalCodingSessions = agents
@@ -44,7 +49,7 @@ export function CommandCenterPage() {
       return {
         title: 'LanceDB',
         subtitle: 'Memory service',
-        status: health.lancedb.status,
+        status: health.lancedb.connected ? ('connected' as const) : ('disconnected' as const),
       }
     }
 
@@ -57,7 +62,14 @@ export function CommandCenterPage() {
     }
 
     return undefined
-  }, [health.lancedb.status, health.obsidian.status, selectedService])
+  }, [health.lancedb.connected, health.obsidian.status, selectedService])
+
+  const nextRun = evolverStatus?.nextRun ?? health.evolver.nextRun
+  const daysUntilNextRun = nextRun
+    ? Math.max(0, Math.ceil((new Date(nextRun).getTime() - now) / (24 * 60 * 60 * 1000)))
+    : 0
+  const pendingPatches = evolverStatus?.pendingPatches ?? pendingPatchCount
+  const weeklyAutoPatches = evolverStatus?.weeklyAutoPatches ?? health.evolver.weeklyAutoPatches
 
   return (
     <div className="opc-page opc-dashboard-page">
@@ -71,15 +83,26 @@ export function CommandCenterPage() {
         />
         <MetricCard
           title="Evolver"
-          value={health.evolver.status}
-          subtitle={`${pendingPatchCount} pending patches · next ${new Date(health.evolver.nextRun ?? '').toLocaleString()}`}
+          value={
+            <span className={evolverStatus?.status === 'running' ? 'opc-pulse-value' : ''}>
+              {evolverStatus?.status ?? health.evolver.status}
+            </span>
+          }
+          subtitle={
+            <button
+              className="opc-metric-link"
+              onClick={() => navigate('/notifications?type=skill_patch_pending')}
+            >
+              {pendingPatches} pending · {weeklyAutoPatches} auto this week · {daysUntilNextRun} 天后
+            </button>
+          }
           accentColor="var(--opc-lavender)"
           icon={<Sparkles />}
         />
         <MetricCard
           title="LanceDB"
-          value={health.lancedb.status}
-          subtitle={`${health.memory.totalEntries} memory entries`}
+          value={health.lancedb.connected ? 'connected' : 'offline'}
+          subtitle={`${health.lancedb.totalEntries} memory entries`}
           accentColor="var(--opc-mint)"
           icon={<Database />}
         />

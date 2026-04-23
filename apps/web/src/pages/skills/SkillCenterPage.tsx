@@ -43,7 +43,7 @@ export function SkillCenterPage() {
       .sort((left, right) => {
         if (sort === 'name') return left.name.localeCompare(right.name)
         if (sort === 'recent') return (right.lastRunAt ?? '').localeCompare(left.lastRunAt ?? '')
-        return right.healthScore - left.healthScore
+        return right.evolver.score - left.evolver.score
       })
   }, [query, skills, sort, status, tag])
 
@@ -101,7 +101,7 @@ export function SkillCenterPage() {
                       label={skill.status}
                     />
                   </div>
-                  <div className="opc-score-ring" style={{ '--score-color': scoreColor(skill.healthScore) } as CSSProperties}>
+                  <div className="opc-score-ring" style={{ '--score-color': scoreColor(skill.evolver.score) } as CSSProperties}>
                     <svg viewBox="0 0 64 64">
                       <circle cx="32" cy="32" r="24" />
                       <circle
@@ -110,11 +110,11 @@ export function SkillCenterPage() {
                         r="24"
                         style={{
                           strokeDasharray: circumference,
-                          strokeDashoffset: circumference * (1 - skill.healthScore),
+                          strokeDashoffset: circumference * (1 - skill.evolver.score),
                         }}
                       />
                     </svg>
-                    <span>{Math.round(skill.healthScore * 100)}</span>
+                    <span>{Math.round(skill.evolver.score * 100)}</span>
                   </div>
                 </div>
                 <p>{skill.description}</p>

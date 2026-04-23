@@ -22,5 +22,31 @@ export const MemoryEntrySchema = z.object({
 
 export const MemoryEntryListSchema = z.array(MemoryEntrySchema)
 
+export const MemoryStatsSchema = z.object({
+  total: z.number(),
+  byType: z.object({
+    episodic: z.number(),
+    semantic: z.number(),
+    procedural: z.number(),
+  }),
+  archived: z.number(),
+  core: z.number(),
+  lastUpdated: z.string().datetime(),
+})
+
+export const LanceDBStatusSchema = z.object({
+  connected: z.boolean(),
+  ollamaReachable: z.boolean(),
+  embeddingModel: z.string().nullable(),
+  totalEntries: z.number(),
+  byType: z.object({
+    episodic: z.number(),
+    semantic: z.number(),
+    procedural: z.number(),
+  }),
+})
+
 export type MemoryType = z.infer<typeof MemoryTypeSchema>
 export type MemoryEntry = z.infer<typeof MemoryEntrySchema>
+export type MemoryStats = z.infer<typeof MemoryStatsSchema>
+export type LanceDBStatus = z.infer<typeof LanceDBStatusSchema>

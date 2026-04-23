@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react'
 import { useMemo, useState } from 'react'
 import type { Notification, NotificationType, Task } from '@opc/core'
 import { Archive, Check, ExternalLink, Filter, X } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { GlassCard, LiquidButton, StatusPill } from '@opc/ui'
 import { TaskCapsuleDrawer } from '@/components/capsule/TaskCapsuleDrawer'
 import { useNotificationStore } from '@/stores/notificationStore'
@@ -128,6 +128,13 @@ function NotificationCard({
           </div>
         ) : null}
 
+        {notification.type === 'evolver_error' ? (
+          <details className="opc-special-block">
+            <summary>{String(notification.payload.summary ?? notification.message)}</summary>
+            <p>{String(notification.payload.lastError ?? notification.payload.error ?? notification.message)}</p>
+          </details>
+        ) : null}
+
         <div className="opc-notification-actions">
           {notification.type === 'skill_patch_pending' && notification.skillId ? (
             <LiquidButton variant="ghost" icon={<ExternalLink />}>
@@ -168,11 +175,13 @@ function NotificationCard({
 }
 
 export function NotificationCenterPage() {
+  const [searchParams] = useSearchParams()
   const { notifications, actionNotification, bulkArchive } = useNotificationStore()
   const { tasks } = useTaskStore()
   const [status, setStatus] = useState<StatusFilter>('all')
   const [priority, setPriority] = useState<PriorityFilter>('all')
-  const [types, setTypes] = useState<NotificationType[]>([])
+  const initialType = searchParams.get('type') as NotificationType | null
+  const [types, setTypes] = useState<NotificationType[]>(initialType && notificationTypes.includes(initialType) ? [initialType] : [])
   const [range, setRange] = useState<'today' | 'week' | 'all'>('all')
   const [selected, setSelected] = useState<string[]>([])
   const [selectedTask, setSelectedTask] = useState<Task | undefined>()

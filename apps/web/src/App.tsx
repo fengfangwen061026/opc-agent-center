@@ -1,9 +1,11 @@
 import { useEffect } from 'react'
+import type { EvolverEvent } from '@opc/core'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppShell } from '@/layouts/AppShell'
 import { PlaceholderPage } from '@/pages/PlaceholderPage'
 import { ChatPage } from '@/pages/chat/ChatPage'
 import { CommandCenterPage } from '@/pages/CommandCenterPage'
+import { MemoryPage } from '@/pages/memory/MemoryPage'
 import { NotificationCenterPage } from '@/pages/notifications/NotificationCenterPage'
 import { SettingsPage } from '@/pages/settings/SettingsPage'
 import { SkillCenterPage } from '@/pages/skills/SkillCenterPage'
@@ -11,6 +13,8 @@ import { SkillDetailPage } from '@/pages/skills/SkillDetailPage'
 import { useAgentStore } from '@/stores/agentStore'
 import { useConversationStore } from '@/stores/conversationStore'
 import { useEventStore } from '@/stores/eventStore'
+import { useEvolverStore } from '@/stores/evolverStore'
+import { useMemoryStore } from '@/stores/memoryStore'
 import { useNotificationStore } from '@/stores/notificationStore'
 import { useSkillStore } from '@/stores/skillStore'
 import { useSystemHealthStore } from '@/stores/systemHealthStore'
@@ -24,6 +28,9 @@ export default function App() {
     void useNotificationStore.getState().fetchNotifications()
     void useConversationStore.getState().fetchConversations()
     void useSkillStore.getState().fetchSkills()
+    void useMemoryStore.getState().fetchStats()
+    void useEvolverStore.getState().fetchStatus()
+    void useEvolverStore.getState().fetchPendingPatches()
 
     const stopEvents = useEventStore.getState().subscribe()
     const stopTaskSync = useTaskStore.getState().subscribeToEvents()
@@ -31,6 +38,15 @@ export default function App() {
       const latest = state.events[state.events.length - 1]
       if (latest && latest !== previous.events[previous.events.length - 1]) {
         useConversationStore.getState().handleEvent(latest)
+        useNotificationStore.getState().handleEvent(latest)
+        if (latest.source === 'evolver' && latest.metadata.evolverEvent) {
+          useEvolverStore.getState().handleWsEvent(latest.metadata.evolverEvent as EvolverEvent)
+        }
+        if (latest.type === 'memory.maintenance.completed') {
+          void useMemoryStore.getState().fetchEvolverLog()
+          void useMemoryStore.getState().fetchEntries()
+          void useMemoryStore.getState().fetchStats()
+        }
         if (latest.type.startsWith('notification.')) {
           void useNotificationStore.getState().fetchNotifications()
         }
@@ -57,10 +73,7 @@ export default function App() {
           />
           <Route path="/skills" element={<SkillCenterPage />} />
           <Route path="/skills/:name" element={<SkillDetailPage />} />
-          <Route
-            path="/memory"
-            element={<PlaceholderPage title="Memory" description="Phase 7 will add the full LanceDB three-column memory workspace." />}
-          />
+          <Route path="/memory" element={<MemoryPage />} />
           <Route path="/notifications" element={<NotificationCenterPage />} />
           <Route
             path="/knowledge"

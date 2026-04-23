@@ -145,7 +145,7 @@ function buildAgentNodes(agents: Agent[], health: SystemHealth): Array<Node<Grap
         subtitle: 'Memory node',
         accentColor: 'var(--opc-mint)',
         avatarType: 'memory',
-        status: health.lancedb.status,
+        status: health.lancedb.connected ? 'connected' : 'disconnected',
       },
     },
     {

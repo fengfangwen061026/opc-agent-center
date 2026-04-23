@@ -1,6 +1,18 @@
 import type { BridgeMode } from '@opc/core'
 
-const secretKeys = new Set(['token', 'password', 'apikey', 'api_key', 'secret', 'authorization', 'cookie'])
+const secretKeys = new Set([
+  'token',
+  'password',
+  'apikey',
+  'api_key',
+  'secret',
+  'authorization',
+  'cookie',
+  'private_key',
+  'ssh_key',
+  'session',
+  'bearer',
+])
 
 export interface BridgeEnv {
   port: number
@@ -8,6 +20,11 @@ export interface BridgeEnv {
   gatewayUrl: string
   deviceName: string
   token?: string
+  lancedbPath: string
+  ollamaUrl: string
+  embeddingModel: string
+  memoryAutoCapture: boolean
+  memoryAutoRecall: boolean
 }
 
 export function loadEnv(): BridgeEnv {
@@ -19,6 +36,11 @@ export function loadEnv(): BridgeEnv {
     gatewayUrl: process.env.OPENCLAW_GATEWAY_URL ?? 'ws://127.0.0.1:18789',
     deviceName: process.env.OPENCLAW_DEVICE_NAME ?? 'opc-bridge',
     token: process.env.OPENCLAW_TOKEN,
+    lancedbPath: process.env.LANCEDB_PATH ?? '~/.openclaw/memory/lancedb',
+    ollamaUrl: process.env.OLLAMA_URL ?? 'http://localhost:11434',
+    embeddingModel: process.env.EMBEDDING_MODEL ?? 'nomic-embed-text',
+    memoryAutoCapture: process.env.MEMORY_AUTO_CAPTURE !== 'false',
+    memoryAutoRecall: process.env.MEMORY_AUTO_RECALL !== 'false',
   }
 }
 

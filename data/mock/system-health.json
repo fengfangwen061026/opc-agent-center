@@ -8,12 +8,10 @@
     "message": "OpenClaw mock gateway active"
   },
   "lancedb": {
-    "status": "connected",
-    "endpoint": "http://127.0.0.1:8080/local",
-    "latencyMs": 11,
-    "version": "mock-embedded",
-    "lastCheckedAt": "2026-04-23T06:58:00.000Z",
-    "message": "50 mock memory entries available"
+    "connected": true,
+    "ollamaReachable": false,
+    "embeddingModel": null,
+    "totalEntries": 50
   },
   "ollama": {
     "status": "connected",
@@ -35,7 +33,8 @@
     "status": "idle",
     "lastRun": "2026-04-21T19:00:00.000Z",
     "nextRun": "2026-04-26T19:00:00.000Z",
-    "pendingPatches": 3
+    "pendingPatches": 3,
+    "weeklyAutoPatches": 5
   },
   "memory": {
     "totalEntries": 50,

@@ -10,6 +10,10 @@ import {
 } from '@/lib/bridgeClient'
 import { useSystemHealthStore } from '@/stores/systemHealthStore'
 
+function mapEvolverStatus(status: 'idle' | 'running' | 'error' | 'disabled') {
+  return status === 'disabled' ? 'disconnected' : status
+}
+
 export function SettingsPage() {
   const { health, bridgeOnline, fetchHealth } = useSystemHealthStore()
   const [bridgeUrl, setBridgeUrl] = useState(getBridgeBaseUrl())
@@ -93,10 +97,10 @@ export function SettingsPage() {
         <div className="opc-status-grid">
           <ConnectionBadge label="Bridge" status={bridgeOnline ? 'connected' : 'disconnected'} />
           <ConnectionBadge label="Gateway" status={health.gateway.status} />
-          <ConnectionBadge label="LanceDB" status={health.lancedb.status} />
+          <ConnectionBadge label={`LanceDB ${health.lancedb.totalEntries}`} status={health.lancedb.connected ? 'connected' : 'disconnected'} />
           <ConnectionBadge label="Ollama" status={health.ollama.status} />
           <ConnectionBadge label="Obsidian" status={health.obsidian.status} />
-          <ConnectionBadge label="Evolver" status={health.evolver.status} />
+          <ConnectionBadge label="Evolver" status={mapEvolverStatus(health.evolver.status)} />
         </div>
       </GlassCard>
     </div>

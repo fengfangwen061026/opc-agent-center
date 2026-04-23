@@ -5,8 +5,10 @@ import { describe, expect, it } from 'vitest'
 import {
   AgentListSchema,
   ConversationListSchema,
+  EvolverEventSchema,
   EvolverLogEntryListSchema,
   EvolverStatusSchema,
+  MemoryStatsSchema,
   MemoryEntryListSchema,
   NotificationListSchema,
   SkillListSchema,
@@ -55,6 +57,18 @@ describe('mock data schemas', () => {
     expect(() => MemoryEntryListSchema.parse(readJson('data/mock/memory.json'))).not.toThrow()
   })
 
+  it('parses a memory stats payload', () => {
+    expect(() =>
+      MemoryStatsSchema.parse({
+        total: 45,
+        byType: { episodic: 22, semantic: 14, procedural: 9 },
+        archived: 5,
+        core: 12,
+        lastUpdated: '2026-04-23T06:00:00.000Z',
+      }),
+    ).not.toThrow()
+  })
+
   it('parses evolver-log.json', () => {
     expect(() => EvolverLogEntryListSchema.parse(readJson('data/mock/evolver-log.json'))).not.toThrow()
   })
@@ -69,6 +83,17 @@ describe('mock data schemas', () => {
         autoPatchCountThisWeek: 4,
         evalsThisWeek: 3,
         memoryMaintenanceCount: 1,
+      }),
+    ).not.toThrow()
+  })
+
+  it('parses evolver event payloads', () => {
+    expect(() =>
+      EvolverEventSchema.parse({
+        type: 'memory.maintenance.completed',
+        merged: 2,
+        pruned: 1,
+        archived: 3,
       }),
     ).not.toThrow()
   })

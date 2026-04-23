@@ -3,14 +3,20 @@ import { ConnectionStatusSchema } from './agent'
 
 export const SystemHealthSchema = z.object({
   gateway: ConnectionStatusSchema,
-  lancedb: ConnectionStatusSchema,
+  lancedb: z.object({
+    connected: z.boolean(),
+    ollamaReachable: z.boolean(),
+    embeddingModel: z.string().nullable(),
+    totalEntries: z.number(),
+  }),
   ollama: ConnectionStatusSchema,
   obsidian: ConnectionStatusSchema,
   evolver: z.object({
-    status: z.enum(['idle', 'running', 'error']),
+    status: z.enum(['idle', 'running', 'error', 'disabled']),
     lastRun: z.string().datetime().optional(),
     nextRun: z.string().datetime().optional(),
     pendingPatches: z.number(),
+    weeklyAutoPatches: z.number(),
   }),
   memory: z.object({
     totalEntries: z.number(),

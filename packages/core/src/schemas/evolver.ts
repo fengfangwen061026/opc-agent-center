@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { SkillPatchSchema } from './skill'
 
 export const EvolverLogEntrySchema = z.object({
   id: z.string().uuid(),
@@ -13,10 +14,11 @@ export const EvolverLogEntrySchema = z.object({
 })
 
 export const EvolverStatusSchema = z.object({
-  status: z.enum(['idle', 'running', 'error']),
+  status: z.enum(['idle', 'running', 'error', 'disabled']),
   lastRun: z.string().datetime().optional(),
   nextRun: z.string().datetime().optional(),
   pendingPatches: z.number().nonnegative(),
+  weeklyAutoPatches: z.number().nonnegative(),
   currentOperation: z.string().optional(),
   lastError: z.string().optional(),
   autoPatchCountThisWeek: z.number().nonnegative(),
@@ -26,5 +28,21 @@ export const EvolverStatusSchema = z.object({
 
 export const EvolverLogEntryListSchema = z.array(EvolverLogEntrySchema)
 
+export const EvolverEventSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('evolver.started'), triggeredBy: z.string() }),
+  z.object({ type: z.literal('evolver.completed'), duration: z.number(), summary: z.string() }),
+  z.object({ type: z.literal('evolver.error'), message: z.string() }),
+  z.object({ type: z.literal('skill.patch.submitted'), skillName: z.string(), patch: SkillPatchSchema }),
+  z.object({ type: z.literal('skill.patch.auto_applied'), skillName: z.string(), summary: z.string() }),
+  z.object({ type: z.literal('memory.maintenance.started') }),
+  z.object({
+    type: z.literal('memory.maintenance.completed'),
+    merged: z.number(),
+    pruned: z.number(),
+    archived: z.number(),
+  }),
+])
+
 export type EvolverLogEntry = z.infer<typeof EvolverLogEntrySchema>
 export type EvolverStatus = z.infer<typeof EvolverStatusSchema>
+export type EvolverEvent = z.infer<typeof EvolverEventSchema>

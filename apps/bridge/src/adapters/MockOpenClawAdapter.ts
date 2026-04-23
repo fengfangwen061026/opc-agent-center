@@ -264,7 +264,7 @@ export class MockOpenClawAdapter implements OpenClawAdapter {
     }
 
     await new Promise((resolve) => setTimeout(resolve, 2000))
-    const score = Math.min(0.95, Math.max(0.6, skill.healthScore + (Math.random() - 0.25) * 0.12))
+    const score = Math.min(0.95, Math.max(0.6, skill.evolver.score + (Math.random() - 0.25) * 0.12))
     const result = createEvalResult(skill.id, Number(score.toFixed(2)))
     this.emit({
       id: `event-eval-${Date.now()}`,
@@ -431,7 +431,7 @@ export class MockOpenClawAdapter implements OpenClawAdapter {
           .map((tag) => `  - ${tag}`)
           .join('\n')}\n---\n`,
       executionHistory: createExecutionHistory(skill),
-      latestEval: createEvalResult(skill.id, skill.healthScore),
+      latestEval: createEvalResult(skill.id, skill.evolver.score),
     })
   }
 

@@ -52,6 +52,13 @@ export const SkillEvalResultSchema = z.object({
   judgeSummary: z.string(),
 })
 
+export const SkillEvolverInfoSchema = z.object({
+  score: z.number().min(0).max(1),
+  pendingPatchCount: z.number().nonnegative(),
+  autoPatchCount: z.number().nonnegative(),
+  patches: z.array(SkillPatchSchema),
+})
+
 export const SkillSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -66,11 +73,7 @@ export const SkillSchema = z.object({
   lastRunAt: z.string().datetime().optional(),
   inputs: z.array(z.string()).default([]),
   outputs: z.array(z.string()).default([]),
-  evolver: z.object({
-    pendingPatchCount: z.number().nonnegative(),
-    autoPatchCount: z.number().nonnegative(),
-    patches: z.array(SkillPatchSchema),
-  }),
+  evolver: SkillEvolverInfoSchema,
 })
 
 export const SkillListSchema = z.array(SkillSchema)
@@ -90,6 +93,7 @@ export type SkillStatus = z.infer<typeof SkillStatusSchema>
 export type SkillPatchType = z.infer<typeof SkillPatchTypeSchema>
 export type SkillPatchStatus = z.infer<typeof SkillPatchStatusSchema>
 export type SkillPatch = z.infer<typeof SkillPatchSchema>
+export type SkillEvolverInfo = z.infer<typeof SkillEvolverInfoSchema>
 export type Skill = z.infer<typeof SkillSchema>
 export type SkillRiskLevel = z.infer<typeof SkillRiskLevelSchema>
 export type SkillExecutionRecord = z.infer<typeof SkillExecutionRecordSchema>

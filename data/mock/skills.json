@@ -13,7 +13,7 @@
     "lastRunAt": "2026-04-23T06:38:00.000Z",
     "inputs": ["user_intent", "available_agents"],
     "outputs": ["agent_id", "routing_reason"],
-    "evolver": { "pendingPatchCount": 0, "autoPatchCount": 1, "patches": [] }
+    "evolver": { "score": 0.93, "pendingPatchCount": 0, "autoPatchCount": 1, "patches": [] }
   },
   {
     "id": "skill-code-change",
@@ -30,6 +30,7 @@
     "inputs": ["repo_context", "request"],
     "outputs": ["diff_summary", "check_results"],
     "evolver": {
+      "score": 0.89,
       "pendingPatchCount": 1,
       "autoPatchCount": 2,
       "patches": [
@@ -64,7 +65,7 @@
     "lastRunAt": "2026-04-23T05:40:00.000Z",
     "inputs": ["message", "context_mode"],
     "outputs": ["memory_context"],
-    "evolver": { "pendingPatchCount": 0, "autoPatchCount": 1, "patches": [] }
+    "evolver": { "score": 0.72, "pendingPatchCount": 0, "autoPatchCount": 1, "patches": [] }
   },
   {
     "id": "skill-knowledge-capture",
@@ -81,6 +82,7 @@
     "inputs": ["task_capsule", "conversation_summary"],
     "outputs": ["note_path", "frontmatter"],
     "evolver": {
+      "score": 0.88,
       "pendingPatchCount": 1,
       "autoPatchCount": 1,
       "patches": [
@@ -115,7 +117,7 @@
     "lastRunAt": "2026-04-23T06:48:00.000Z",
     "inputs": ["action", "risk_level"],
     "outputs": ["notification_id"],
-    "evolver": { "pendingPatchCount": 0, "autoPatchCount": 0, "patches": [] }
+    "evolver": { "score": 0.95, "pendingPatchCount": 0, "autoPatchCount": 0, "patches": [] }
   },
   {
     "id": "skill-memory-maintenance",
@@ -132,6 +134,7 @@
     "inputs": ["memory_snapshot"],
     "outputs": ["maintenance_report"],
     "evolver": {
+      "score": 0.68,
       "pendingPatchCount": 1,
       "autoPatchCount": 3,
       "patches": [
@@ -165,7 +168,7 @@
     "healthScore": 0.68,
     "inputs": ["skill_description", "examples"],
     "outputs": ["eval_cases"],
-    "evolver": { "pendingPatchCount": 0, "autoPatchCount": 0, "patches": [] }
+    "evolver": { "score": 0.48, "pendingPatchCount": 0, "autoPatchCount": 0, "patches": [] }
   },
   {
     "id": "skill-vault-sync",
@@ -181,6 +184,6 @@
     "lastRunAt": "2026-04-22T16:20:00.000Z",
     "inputs": ["note_payload"],
     "outputs": ["queue_receipt"],
-    "evolver": { "pendingPatchCount": 0, "autoPatchCount": 1, "patches": [] }
+    "evolver": { "score": 0.52, "pendingPatchCount": 0, "autoPatchCount": 1, "patches": [] }
   }
 ]

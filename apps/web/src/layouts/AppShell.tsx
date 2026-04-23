@@ -14,7 +14,9 @@ import {
   Zap,
 } from 'lucide-react'
 import { ConnectionBadge, GlassCard, LiquidButton, StatusPill } from '@opc/ui'
+import type { StatusPillStatus } from '@opc/ui'
 import { useEventStore } from '@/stores/eventStore'
+import { useEvolverStore } from '@/stores/evolverStore'
 import { useNotificationStore } from '@/stores/notificationStore'
 import { useSystemHealthStore } from '@/stores/systemHealthStore'
 
@@ -22,8 +24,8 @@ const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/chat', label: 'Chat', icon: MessageSquare },
   { to: '/agents', label: 'Agents', icon: Cpu },
-  { to: '/skills', label: 'Skills', icon: Zap },
   { to: '/memory', label: 'Memory', icon: Brain },
+  { to: '/skills', label: 'Skills', icon: Zap },
   { to: '/notifications', label: 'Notifications', icon: Bell },
   { to: '/knowledge', label: 'Knowledge', icon: BookOpen },
   { to: '/settings', label: 'Settings', icon: Settings },
@@ -33,23 +35,52 @@ function mapConnectionStatus(status: 'connected' | 'disconnected' | 'running' | 
   return status
 }
 
+function mapEvolverStatus(status: 'idle' | 'running' | 'error' | 'disabled') {
+  return status === 'disabled' ? 'disconnected' : status
+}
+
 export function AppShell() {
   const { health, bridgeOnline } = useSystemHealthStore()
+  const { status: evolverStatus } = useEvolverStore()
   const { notifications, approvalCount } = useNotificationStore()
   const { events } = useEventStore()
 
   const pendingApprovalNotifications = notifications.filter((item) => item.actionRequired).slice(0, 3)
   const recentEvents = events.slice(-5).reverse()
 
-  const connectionBadges = useMemo(
+  const connectionBadges = useMemo<Array<{ label: string; status: StatusPillStatus; detail?: string }>>(
     () => [
       { label: 'Gateway', status: mapConnectionStatus(health.gateway.status), detail: health.gateway.message },
-      { label: 'LanceDB', status: mapConnectionStatus(health.lancedb.status), detail: health.lancedb.message },
+      {
+        label: `LanceDB ${health.lancedb.totalEntries}`,
+        status: health.lancedb.connected ? 'connected' : 'disconnected',
+        detail: health.lancedb.embeddingModel
+          ? `${health.lancedb.embeddingModel} ready`
+          : 'Mock keyword recall active',
+      },
       { label: 'Ollama', status: mapConnectionStatus(health.ollama.status), detail: health.ollama.message },
       { label: 'Obsidian', status: mapConnectionStatus(health.obsidian.status), detail: health.obsidian.message },
-      { label: 'Evolver', status: mapConnectionStatus(health.evolver.status), detail: 'System evolution agent' },
+      {
+        label: 'Evolver',
+        status: mapEvolverStatus(evolverStatus?.status ?? health.evolver.status),
+        detail: `${evolverStatus?.pendingPatches ?? health.evolver.pendingPatches} pending patches`,
+      },
     ],
-    [health.evolver.status, health.gateway.message, health.gateway.status, health.lancedb.message, health.lancedb.status, health.obsidian.message, health.obsidian.status, health.ollama.message, health.ollama.status],
+    [
+      evolverStatus?.pendingPatches,
+      evolverStatus?.status,
+      health.evolver.pendingPatches,
+      health.evolver.status,
+      health.gateway.message,
+      health.gateway.status,
+      health.lancedb.connected,
+      health.lancedb.embeddingModel,
+      health.lancedb.totalEntries,
+      health.obsidian.message,
+      health.obsidian.status,
+      health.ollama.message,
+      health.ollama.status,
+    ],
   )
 
   return (
@@ -97,6 +128,9 @@ export function AppShell() {
                 data-tooltip={item.label}
               >
                 <Icon aria-hidden="true" />
+                {item.label === 'Memory' && health.lancedb.totalEntries > 0 ? (
+                  <span className="opc-nav-badge opc-nav-badge--muted">{health.lancedb.totalEntries}</span>
+                ) : null}
                 {item.label === 'Notifications' && approvalCount > 0 ? (
                   <span className="opc-nav-badge">{approvalCount}</span>
                 ) : null}
@@ -144,9 +178,10 @@ export function AppShell() {
               <Sparkles className="opc-rail-icon" />
             </div>
             <div className="opc-rail-status">
-              <StatusPill status={health.evolver.status} />
+              <StatusPill status={mapEvolverStatus(evolverStatus?.status ?? health.evolver.status)} />
               <p className="opc-rail-copy">
-                Next run {new Date(health.evolver.nextRun ?? '').toLocaleString()}
+                {evolverStatus?.pendingPatches ?? health.evolver.pendingPatches} pending · next{' '}
+                {new Date(evolverStatus?.nextRun ?? health.evolver.nextRun ?? '').toLocaleString()}
               </p>
             </div>
           </GlassCard>

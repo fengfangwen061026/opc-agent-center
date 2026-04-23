@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Notification, NotificationFilter } from '@opc/core'
+import type { Notification, NotificationFilter, SystemEvent } from '@opc/core'
 import { fetchBridge } from '@/lib/bridgeClient'
 import notificationData from '../../../../data/mock/notifications.json'
 
@@ -13,6 +13,8 @@ interface NotificationStore {
   actionNotification: (id: string, action: string) => Promise<void>
   upsertNotification: (notification: Notification) => void
   bulkArchive: (ids: string[]) => void
+  resolveSkillPatch: (skillName: string, action: 'approve' | 'reject') => void
+  handleEvent: (event: SystemEvent) => void
 }
 
 function deriveCounts(notifications: Notification[]) {
@@ -104,4 +106,63 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
       )
       return { notifications: next, ...deriveCounts(next) }
     }),
+  resolveSkillPatch: (skillName, action) =>
+    set((state) => {
+      const slug = skillName.toLowerCase().replaceAll(' ', '-')
+      const next = state.notifications.map((item) =>
+        item.type === 'skill_patch_pending' &&
+        (item.skillId === skillName ||
+          item.skillId === slug ||
+          item.skillId === `skill-${slug}` ||
+          item.payload.skillName === skillName)
+          ? {
+              ...item,
+              read: true,
+              actionRequired: false,
+              status: action === 'approve' ? ('done' as const) : ('dismissed' as const),
+            }
+          : item,
+      )
+      return { notifications: next, ...deriveCounts(next) }
+    }),
+  handleEvent: (event) => {
+    if (event.type !== 'skill.patch.submitted') {
+      return
+    }
+
+    const patch = event.metadata.evolverEvent as
+      | { type: 'skill.patch.submitted'; skillName: string; patch: { id: string; summary: string; reason: string; scoreBefore?: number; scoreAfter?: number; diff?: { before: string; after: string } } }
+      | undefined
+
+    if (!patch) {
+      return
+    }
+
+    useNotificationStore.getState().upsertNotification({
+      id: `notification-${patch.patch.id}`,
+      type: 'skill_patch_pending',
+      title: `Patch pending: ${patch.skillName}`,
+      message: patch.patch.summary,
+      severity: 'warning',
+      status: 'unread',
+      priority: 'high',
+      read: false,
+      actionRequired: true,
+      createdAt: new Date().toISOString(),
+      skillId: patch.skillName,
+      payload: {
+        skillName: patch.skillName,
+        patchId: patch.patch.id,
+        reason: patch.patch.reason,
+        scoreBefore: patch.patch.scoreBefore,
+        scoreAfter: patch.patch.scoreAfter,
+        before: patch.patch.diff?.before,
+        after: patch.patch.diff?.after,
+      },
+      actions: [
+        { id: 'approve', label: '批准', variant: 'primary' },
+        { id: 'reject', label: '拒绝', variant: 'danger' },
+      ],
+    })
+  },
 }))
