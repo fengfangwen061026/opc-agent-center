@@ -1,6 +1,6 @@
 import WebSocket from 'ws'
 import { randomUUID } from 'node:crypto'
-import type { SystemEvent, SystemHealth } from '@opc/core'
+import type { NotifyInput, SystemEvent, SystemHealth } from '@opc/core'
 import { MockOpenClawAdapter } from './MockOpenClawAdapter'
 
 interface WsOpenClawAdapterOptions {
@@ -30,7 +30,11 @@ export class WsOpenClawAdapter extends MockOpenClawAdapter {
 
   override async getStatus(): Promise<SystemHealth> {
     const health = await super.getStatus()
-    const status = this.authenticated ? 'connected' : this.liveConnected ? 'running' : 'disconnected'
+    const status = this.authenticated
+      ? 'connected'
+      : this.liveConnected
+        ? 'running'
+        : 'disconnected'
 
     return {
       ...health,
@@ -119,6 +123,25 @@ export class WsOpenClawAdapter extends MockOpenClawAdapter {
     await super.disconnect()
   }
 
+  override async sendNotification(
+    channel: 'weixin' | 'feishu',
+    message: NotifyInput,
+  ): Promise<void> {
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN || !this.authenticated) {
+      await super.sendNotification(channel, message)
+      return
+    }
+
+    this.socket.send(
+      JSON.stringify({
+        type: 'channel.send',
+        channel,
+        content: `【${message.title}】\n${message.body}`,
+        priority: message.priority,
+      }),
+    )
+  }
+
   private scheduleReconnect(reason: string) {
     if (this.closed || this.reconnectTimer) {
       return
@@ -139,7 +162,10 @@ export class WsOpenClawAdapter extends MockOpenClawAdapter {
   }
 
   private sendConnectRequest(message: Record<string, unknown>) {
-    const payload = message.payload && typeof message.payload === 'object' ? (message.payload as Record<string, unknown>) : message
+    const payload =
+      message.payload && typeof message.payload === 'object'
+        ? (message.payload as Record<string, unknown>)
+        : message
     const nonce = typeof payload.nonce === 'string' ? payload.nonce.trim() : ''
     if (!nonce) {
       console.warn('[ws-adapter] gateway challenge missing nonce')
@@ -173,12 +199,20 @@ export class WsOpenClawAdapter extends MockOpenClawAdapter {
   }
 
   private isConnectResponse(message: Record<string, unknown>) {
-    return message.type === 'res' && typeof message.id === 'string' && message.id === this.connectRequestId
+    return (
+      message.type === 'res' &&
+      typeof message.id === 'string' &&
+      message.id === this.connectRequestId
+    )
   }
 }
 
 function gatewayMessageType(record: Record<string, unknown>) {
-  return typeof record.event === 'string' ? record.event : typeof record.type === 'string' ? record.type : 'gateway.event'
+  return typeof record.event === 'string'
+    ? record.event
+    : typeof record.type === 'string'
+      ? record.type
+      : 'gateway.event'
 }
 
 function mapGatewayEvent(message: unknown): SystemEvent | null {
@@ -205,7 +239,9 @@ function mapGatewayEvent(message: unknown): SystemEvent | null {
     }
   }
 
-  const payload = (record.payload && typeof record.payload === 'object' ? record.payload : record) as Record<string, unknown>
+  const payload = (
+    record.payload && typeof record.payload === 'object' ? record.payload : record
+  ) as Record<string, unknown>
   return {
     id: String(record.id ?? `gateway-${eventName}-${Date.now()}`),
     type: eventName,

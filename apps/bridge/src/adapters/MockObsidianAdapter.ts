@@ -1,4 +1,10 @@
-import type { ObsidianStatus, ReviewQueueEntry, VaultNode, VaultNote, VaultSearchResult } from '@opc/core'
+import type {
+  ObsidianStatus,
+  ReviewQueueEntry,
+  VaultNode,
+  VaultNote,
+  VaultSearchResult,
+} from '@opc/core'
 import { VaultNoteSchema } from '@opc/core'
 import type { ObsidianAdapter, WriteOptions } from './ObsidianAdapter'
 
@@ -31,14 +37,16 @@ export class MockObsidianAdapter implements ObsidianAdapter {
       {
         title: 'OpenClaw Gateway configuration reference',
         sourceUrl: 'https://docs.openclaw.ai/gateway/configuration',
-        summary: 'Config is stored in ~/.openclaw/openclaw.json and can be edited via CLI or Control UI.',
+        summary:
+          'Config is stored in ~/.openclaw/openclaw.json and can be edited via CLI or Control UI.',
         tags: ['openclaw', 'gateway'],
         capturedAt,
         taskId: 'task-knowledge-001',
       },
       {
         title: 'Memory plugin rollout note',
-        summary: 'Active memory should degrade to keyword recall when Ollama embedding is unavailable.',
+        summary:
+          'Active memory should degrade to keyword recall when Ollama embedding is unavailable.',
         tags: ['memory', 'lancedb'],
         capturedAt,
       },
@@ -56,7 +64,8 @@ export class MockObsidianAdapter implements ObsidianAdapter {
       },
       {
         title: 'Dashboard topology note',
-        summary: 'The dashboard graph uses fixed nodes for OpenClaw, LanceDB, Obsidian, and Evolver.',
+        summary:
+          'The dashboard graph uses fixed nodes for OpenClaw, LanceDB, Obsidian, and Evolver.',
         tags: ['dashboard', 'architecture'],
         capturedAt,
       },
@@ -64,21 +73,40 @@ export class MockObsidianAdapter implements ObsidianAdapter {
 
     this.notes = new Map(
       [
-        ['Projects/OPC Agent Center/Architecture.md', '# Architecture\n\nOpenClaw, LanceDB, Obsidian, and Evolver are bridged through OPC Bridge.'],
-        ['Projects/OPC Agent Center/Phase Log.md', '# Phase Log\n\nPhase 0-10 tracks the cockpit from mock-first to local adapters.'],
-        ['Daily Notes/2026-04-23.md', '# 2026-04-23\n\nInstalled OpenClaw Gateway and pulled nomic-embed-text.'],
-        ['Archive/Legacy Hermes.md', '# Legacy Hermes\n\nHermes-based architecture was retired in v2.0.'],
-        ...reviewEntries.map((entry, index) => [
-          `Review Queue/${String(index + 1).padStart(2, '0')} - ${entry.title}.md`,
-          noteContent(entry),
-        ] as const),
+        [
+          'Projects/OPC Agent Center/Architecture.md',
+          '# Architecture\n\nOpenClaw, LanceDB, Obsidian, and Evolver are bridged through OPC Bridge.',
+        ],
+        [
+          'Projects/OPC Agent Center/Phase Log.md',
+          '# Phase Log\n\nPhase 0-10 tracks the cockpit from mock-first to local adapters.',
+        ],
+        [
+          'Daily Notes/2026-04-23.md',
+          '# 2026-04-23\n\nInstalled OpenClaw Gateway and pulled nomic-embed-text.',
+        ],
+        [
+          'Archive/Legacy Hermes.md',
+          '# Legacy Hermes\n\nHermes-based architecture was retired in v2.0.',
+        ],
+        ...reviewEntries.map(
+          (entry, index) =>
+            [
+              `Review Queue/${String(index + 1).padStart(2, '0')} - ${entry.title}.md`,
+              noteContent(entry),
+            ] as const,
+        ),
       ].map(([path, content]) => [
         path,
         VaultNoteSchema.parse({
           path,
           content,
           frontmatter: path.startsWith('Review Queue/')
-            ? frontmatterFor(reviewEntries[Number(path.slice('Review Queue/'.length, 'Review Queue/'.length + 2)) - 1])
+            ? frontmatterFor(
+                reviewEntries[
+                  Number(path.slice('Review Queue/'.length, 'Review Queue/'.length + 2)) - 1
+                ],
+              )
             : { status: 'active' },
           modified: capturedAt,
         }),
@@ -119,7 +147,9 @@ export class MockObsidianAdapter implements ObsidianAdapter {
           children: isFile ? undefined : build(nodePath),
         })
       }
-      return Array.from(nodes.values()).sort((left, right) => left.type.localeCompare(right.type) || left.name.localeCompare(right.name))
+      return Array.from(nodes.values()).sort(
+        (left, right) => left.type.localeCompare(right.type) || left.name.localeCompare(right.name),
+      )
     }
 
     return build(normalizedPath)
@@ -133,7 +163,10 @@ export class MockObsidianAdapter implements ObsidianAdapter {
     if (options.overwrite === false && this.notes.has(path)) {
       throw new Error('Note already exists')
     }
-    this.notes.set(path, VaultNoteSchema.parse({ path, content, frontmatter: {}, modified: nowIso() }))
+    this.notes.set(
+      path,
+      VaultNoteSchema.parse({ path, content, frontmatter: {}, modified: nowIso() }),
+    )
   }
 
   async appendNote(path: string, content: string): Promise<void> {
@@ -151,11 +184,14 @@ export class MockObsidianAdapter implements ObsidianAdapter {
     return Array.from(this.notes.values())
       .map((note) => {
         const haystack = `${note.path} ${note.content}`.toLowerCase()
-        const score = (haystack.includes(needle) ? 1 : 0) + (note.path.toLowerCase().includes(needle) ? 0.5 : 0)
+        const score =
+          (haystack.includes(needle) ? 1 : 0) + (note.path.toLowerCase().includes(needle) ? 0.5 : 0)
         return {
           path: note.path,
           score,
-          excerpt: note.content.split('\n').find((line) => line.toLowerCase().includes(needle)) ?? note.content.slice(0, 140),
+          excerpt:
+            note.content.split('\n').find((line) => line.toLowerCase().includes(needle)) ??
+            note.content.slice(0, 140),
         }
       })
       .filter((result) => result.score > 0)

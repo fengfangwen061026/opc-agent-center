@@ -1,10 +1,11 @@
 import type { CSSProperties } from 'react'
 import { useMemo, useState } from 'react'
 import type { Notification, NotificationType, Task } from '@opc/core'
-import { Archive, Check, ExternalLink, Filter, X } from 'lucide-react'
+import { Archive, Check, ExternalLink, Filter, MessageSquare, Send, X } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { GlassCard, LiquidButton, StatusPill } from '@opc/ui'
 import { TaskCapsuleDrawer } from '@/components/capsule/TaskCapsuleDrawer'
+import { fetchBridge } from '@/lib/bridgeClient'
 import { useNotificationStore } from '@/stores/notificationStore'
 import { useTaskStore } from '@/stores/taskStore'
 
@@ -48,8 +49,15 @@ function notificationPriority(notification: Notification): Notification['priorit
 }
 
 function DiffPreview({ notification }: { notification: Notification }) {
-  const before = String(notification.payload.before ?? notification.payload.patchBefore ?? 'Previous prompt wording')
-  const after = String(notification.payload.after ?? notification.payload.patchAfter ?? notification.payload.patchSummary ?? 'Updated prompt wording')
+  const before = String(
+    notification.payload.before ?? notification.payload.patchBefore ?? 'Previous prompt wording',
+  )
+  const after = String(
+    notification.payload.after ??
+      notification.payload.patchAfter ??
+      notification.payload.patchSummary ??
+      'Updated prompt wording',
+  )
 
   return (
     <details className="opc-diff-preview">
@@ -65,12 +73,14 @@ function NotificationCard({
   checked,
   onChecked,
   onAction,
+  onPush,
   onTask,
 }: {
   notification: Notification
   checked: boolean
   onChecked: (checked: boolean) => void
   onAction: (action: string) => void
+  onPush: (channel: 'weixin' | 'feishu') => void
   onTask: (taskId: string) => void
 }) {
   const priority = notificationPriority(notification)
@@ -94,23 +104,31 @@ function NotificationCard({
             <h2>{notification.title}</h2>
             <p>{notification.message}</p>
           </div>
-          <StatusPill status={priority === 'high' ? 'error' : priority === 'medium' ? 'running' : 'idle'} label={priority} />
+          <StatusPill
+            status={priority === 'high' ? 'error' : priority === 'medium' ? 'running' : 'idle'}
+            label={priority}
+          />
         </div>
 
         {notification.type === 'approval_required' ? (
           <div className="opc-special-block">
             <strong>{String(notification.payload.action ?? 'Approval action')}</strong>
-            <span>Agent: {notification.agentId ?? 'unknown'} · Risk: {String(notification.payload.riskLevel ?? 'S3')}</span>
+            <span>
+              Agent: {notification.agentId ?? 'unknown'} · Risk:{' '}
+              {String(notification.payload.riskLevel ?? 'S3')}
+            </span>
           </div>
         ) : null}
 
         {notification.type === 'skill_patch_pending' ? (
           <div className="opc-special-block">
             <span>
-              {String(notification.payload.skillName ?? notification.skillId)} · v{String(notification.payload.version ?? 'current')}
+              {String(notification.payload.skillName ?? notification.skillId)} · v
+              {String(notification.payload.version ?? 'current')}
             </span>
             <span>
-              Eval {String(notification.payload.scoreBefore ?? '--')} → {String(notification.payload.scoreAfter ?? '--')}
+              Eval {String(notification.payload.scoreBefore ?? '--')} →{' '}
+              {String(notification.payload.scoreAfter ?? '--')}
             </span>
             <DiffPreview notification={notification} />
           </div>
@@ -118,15 +136,18 @@ function NotificationCard({
 
         {notification.type === 'skill_auto_patched' ? (
           <div className="opc-special-block">
-            <span>只读记录：{String(notification.payload.changedFields ?? 'description, tags')}</span>
+            <span>
+              只读记录：{String(notification.payload.changedFields ?? 'description, tags')}
+            </span>
           </div>
         ) : null}
 
         {notification.type === 'memory_maintenance_report' ? (
           <div className="opc-special-block">
             <span>
-              合并 {String(notification.payload.merged ?? 0)} 条 · 清理 {String(notification.payload.archived ?? 0)} 条 ·
-              本周新增 {String(notification.payload.created ?? 12)} 条
+              合并 {String(notification.payload.merged ?? 0)} 条 · 清理{' '}
+              {String(notification.payload.archived ?? 0)} 条 · 本周新增{' '}
+              {String(notification.payload.created ?? 12)} 条
             </span>
           </div>
         ) : null}
@@ -142,14 +163,37 @@ function NotificationCard({
         {notification.type === 'evolver_error' ? (
           <details className="opc-special-block">
             <summary>{String(notification.payload.summary ?? notification.message)}</summary>
-            <p>{String(notification.payload.lastError ?? notification.payload.error ?? notification.message)}</p>
+            <p>
+              {String(
+                notification.payload.lastError ??
+                  notification.payload.error ??
+                  notification.message,
+              )}
+            </p>
           </details>
         ) : null}
 
         <div className="opc-notification-actions">
+          {notification.type === 'approval_required' ||
+          notification.type === 'skill_patch_pending' ? (
+            <>
+              <LiquidButton
+                variant="ghost"
+                icon={<MessageSquare />}
+                onClick={() => onPush('weixin')}
+              >
+                推送到微信
+              </LiquidButton>
+              <LiquidButton variant="ghost" icon={<Send />} onClick={() => onPush('feishu')}>
+                推送到飞书
+              </LiquidButton>
+            </>
+          ) : null}
           {notification.type === 'skill_patch_pending' && notification.skillId ? (
             <LiquidButton variant="ghost" icon={<ExternalLink />}>
-              <Link to={`/skills/${encodeURIComponent(notification.skillId)}?tab=evolution`}>查看完整 diff</Link>
+              <Link to={`/skills/${encodeURIComponent(notification.skillId)}?tab=evolution`}>
+                查看完整 diff
+              </Link>
             </LiquidButton>
           ) : null}
           {notification.type === 'memory_maintenance_report' ? (
@@ -197,7 +241,9 @@ export function NotificationCenterPage() {
   const [status, setStatus] = useState<StatusFilter>('all')
   const [priority, setPriority] = useState<PriorityFilter>('all')
   const initialType = searchParams.get('type') as NotificationType | null
-  const [types, setTypes] = useState<NotificationType[]>(initialType && notificationTypes.includes(initialType) ? [initialType] : [])
+  const [types, setTypes] = useState<NotificationType[]>(
+    initialType && notificationTypes.includes(initialType) ? [initialType] : [],
+  )
   const [range, setRange] = useState<'today' | 'week' | 'all'>('all')
   const [selected, setSelected] = useState<string[]>([])
   const [selectedTask, setSelectedTask] = useState<Task | undefined>()
@@ -218,10 +264,25 @@ export function NotificationCenterPage() {
   }, [notifications, now, priority, range, status, types])
 
   const toggleType = (type: NotificationType) => {
-    setTypes((current) => (current.includes(type) ? current.filter((item) => item !== type) : [...current, type]))
+    setTypes((current) =>
+      current.includes(type) ? current.filter((item) => item !== type) : [...current, type],
+    )
   }
 
   const allSelected = filtered.length > 0 && filtered.every((item) => selected.includes(item.id))
+  const sendToChannel = async (channel: 'weixin' | 'feishu', notification: Notification) => {
+    await fetchBridge('/api/notify', {
+      method: 'POST',
+      body: JSON.stringify({
+        channel,
+        title: notification.title,
+        body: String(notification.payload.summary ?? notification.message),
+        type: notification.type,
+        priority: notificationPriority(notification) === 'high' ? 'high' : 'normal',
+      }),
+    })
+    window.alert(channel === 'weixin' ? '已推送到微信' : '已推送到飞书')
+  }
 
   return (
     <div className="opc-page opc-notifications-page">
@@ -230,7 +291,11 @@ export function NotificationCenterPage() {
         <h1 className="opc-section-title">Notification Center</h1>
         <label>
           状态
-          <select className="opc-field" value={status} onChange={(event) => setStatus(event.target.value as StatusFilter)}>
+          <select
+            className="opc-field"
+            value={status}
+            onChange={(event) => setStatus(event.target.value as StatusFilter)}
+          >
             <option value="all">全部</option>
             <option value="pending">待处理</option>
             <option value="done">已完成</option>
@@ -239,7 +304,11 @@ export function NotificationCenterPage() {
         </label>
         <label>
           优先级
-          <select className="opc-field" value={priority} onChange={(event) => setPriority(event.target.value as PriorityFilter)}>
+          <select
+            className="opc-field"
+            value={priority}
+            onChange={(event) => setPriority(event.target.value as PriorityFilter)}
+          >
             <option value="all">全部</option>
             <option value="high">high</option>
             <option value="medium">medium</option>
@@ -248,7 +317,11 @@ export function NotificationCenterPage() {
         </label>
         <label>
           时间
-          <select className="opc-field" value={range} onChange={(event) => setRange(event.target.value as 'today' | 'week' | 'all')}>
+          <select
+            className="opc-field"
+            value={range}
+            onChange={(event) => setRange(event.target.value as 'today' | 'week' | 'all')}
+          >
             <option value="today">今天</option>
             <option value="week">本周</option>
             <option value="all">全部</option>
@@ -257,7 +330,11 @@ export function NotificationCenterPage() {
         <div className="opc-type-filter">
           {notificationTypes.map((type) => (
             <label key={type}>
-              <input type="checkbox" checked={types.includes(type)} onChange={() => toggleType(type)} />
+              <input
+                type="checkbox"
+                checked={types.includes(type)}
+                onChange={() => toggleType(type)}
+              />
               {type}
             </label>
           ))}
@@ -271,7 +348,9 @@ export function NotificationCenterPage() {
               type="checkbox"
               checked={allSelected}
               onChange={(event) =>
-                setSelected(event.target.checked ? filtered.map((notification) => notification.id) : [])
+                setSelected(
+                  event.target.checked ? filtered.map((notification) => notification.id) : [],
+                )
               }
             />
             全选
@@ -299,10 +378,13 @@ export function NotificationCenterPage() {
               checked={selected.includes(notification.id)}
               onChecked={(checked) =>
                 setSelected((current) =>
-                  checked ? [...current, notification.id] : current.filter((id) => id !== notification.id),
+                  checked
+                    ? [...current, notification.id]
+                    : current.filter((id) => id !== notification.id),
                 )
               }
               onAction={(action) => void actionNotification(notification.id, action)}
+              onPush={(channel) => void sendToChannel(channel, notification)}
               onTask={(taskId) => setSelectedTask(tasks.find((task) => task.id === taskId))}
             />
           ))}

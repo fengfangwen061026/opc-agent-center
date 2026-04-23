@@ -48,12 +48,20 @@ export function AppShell() {
   const { reviewQueue } = useObsidianStore()
   const { events } = useEventStore()
 
-  const pendingApprovalNotifications = notifications.filter((item) => item.actionRequired).slice(0, 3)
+  const pendingApprovalNotifications = notifications
+    .filter((item) => item.actionRequired)
+    .slice(0, 3)
   const recentEvents = events.slice(-5).reverse()
 
-  const connectionBadges = useMemo<Array<{ label: string; status: StatusPillStatus; detail?: string }>>(
+  const connectionBadges = useMemo<
+    Array<{ label: string; status: StatusPillStatus; detail?: string; onClick?: () => void }>
+  >(
     () => [
-      { label: 'Gateway', status: mapConnectionStatus(health.gateway.status), detail: health.gateway.message },
+      {
+        label: 'Gateway',
+        status: mapConnectionStatus(health.gateway.status),
+        detail: health.gateway.message,
+      },
       {
         label: `LanceDB ${health.lancedb.totalEntries}`,
         status: health.lancedb.connected ? 'connected' : 'disconnected',
@@ -61,11 +69,16 @@ export function AppShell() {
           ? `${health.lancedb.embeddingModel} ready`
           : 'Mock keyword recall active',
       },
-      { label: 'Ollama', status: mapConnectionStatus(health.ollama.status), detail: health.ollama.message },
+      {
+        label: 'Ollama',
+        status: mapConnectionStatus(health.ollama.status),
+        detail: health.ollama.message,
+      },
       {
         label: `Obsidian ${health.obsidian.fileCount}`,
         status: health.obsidian.connected ? 'connected' : 'disconnected',
         detail: health.obsidian.vaultName ?? 'Mock vault cache',
+        onClick: () => window.open('obsidian://open?vault=obsidian-vault'),
       },
       {
         label: 'Evolver',
@@ -107,7 +120,11 @@ export function AppShell() {
 
         <GlassCard className="opc-topbar__search" variant="strong" padding="sm">
           <Search aria-hidden="true" />
-          <input type="search" placeholder="Search agents, tasks, memories" aria-label="Global search" />
+          <input
+            type="search"
+            placeholder="Search agents, tasks, memories"
+            aria-label="Global search"
+          />
         </GlassCard>
 
         <div className="opc-topbar__status">
@@ -117,6 +134,9 @@ export function AppShell() {
               label={badge.label}
               status={badge.status}
               detail={badge.detail}
+              onClick={badge.onClick}
+              role={badge.onClick ? 'button' : undefined}
+              tabIndex={badge.onClick ? 0 : undefined}
             />
           ))}
         </div>
@@ -137,7 +157,9 @@ export function AppShell() {
               >
                 <Icon aria-hidden="true" />
                 {item.label === 'Memory' && health.lancedb.totalEntries > 0 ? (
-                  <span className="opc-nav-badge opc-nav-badge--muted">{health.lancedb.totalEntries}</span>
+                  <span className="opc-nav-badge opc-nav-badge--muted">
+                    {health.lancedb.totalEntries}
+                  </span>
                 ) : null}
                 {item.label === 'Notifications' && approvalCount > 0 ? (
                   <span className="opc-nav-badge">{approvalCount}</span>
@@ -185,7 +207,9 @@ export function AppShell() {
               <Sparkles className="opc-rail-icon" />
             </div>
             <div className="opc-rail-status">
-              <StatusPill status={mapEvolverStatus(evolverStatus?.status ?? health.evolver.status)} />
+              <StatusPill
+                status={mapEvolverStatus(evolverStatus?.status ?? health.evolver.status)}
+              />
               <p className="opc-rail-copy">
                 {evolverStatus?.pendingPatches ?? health.evolver.pendingPatches} pending · next{' '}
                 {new Date(evolverStatus?.nextRun ?? health.evolver.nextRun ?? '').toLocaleString()}

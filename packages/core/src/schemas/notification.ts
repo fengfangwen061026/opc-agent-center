@@ -41,9 +41,24 @@ export const NotificationSchema = z.object({
 
 export const NotificationListSchema = z.array(NotificationSchema)
 
+export const NotifyInputSchema = z.object({
+  channel: z.enum(['weixin', 'feishu']),
+  title: z.string(),
+  body: z.string(),
+  type: z.enum([
+    'approval_required',
+    'skill_patch_pending',
+    'task_report',
+    'evolver_update',
+    'memory_report',
+  ]),
+  priority: z.enum(['high', 'normal']).default('normal'),
+})
+
 export type NotificationType = z.infer<typeof NotificationTypeSchema>
 export type NotificationSeverity = z.infer<typeof NotificationSeveritySchema>
 export type NotificationStatus = z.infer<typeof NotificationStatusSchema>
 export type NotificationPriority = z.infer<typeof NotificationPrioritySchema>
 export type NotificationAction = z.infer<typeof NotificationActionSchema>
 export type Notification = z.infer<typeof NotificationSchema>
+export type NotifyInput = z.infer<typeof NotifyInputSchema>

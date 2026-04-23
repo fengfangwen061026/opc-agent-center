@@ -24,10 +24,22 @@ export function NoteViewer() {
           <h1 className="opc-section-title">{activeNote.path}</h1>
         </div>
         <div className="opc-drawer-actions">
-          <LiquidButton variant="ghost" icon={<ExternalLink />}>
-            <a href={`obsidian://open?path=${encodeURIComponent(activeNote.path)}`}>在 Obsidian 中打开</a>
+          <LiquidButton
+            variant="ghost"
+            icon={<ExternalLink />}
+            onClick={() =>
+              window.open(
+                `obsidian://open?vault=obsidian-vault&file=${encodeURIComponent(activeNote.path)}`,
+              )
+            }
+          >
+            在 Obsidian 中打开
           </LiquidButton>
-          <LiquidButton variant="ghost" icon={<Clipboard />} onClick={() => void navigator.clipboard.writeText(activeNote.path)}>
+          <LiquidButton
+            variant="ghost"
+            icon={<Clipboard />}
+            onClick={() => void navigator.clipboard.writeText(activeNote.path)}
+          >
             复制路径
           </LiquidButton>
         </div>

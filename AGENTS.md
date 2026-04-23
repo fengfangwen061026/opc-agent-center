@@ -46,17 +46,24 @@ opc-agent-center/
 
 ## 当前阶段
 
-**全部 Phase 0-10 验收通过，真实系统接入完成。**
+**全部系统接入完成。**
 
-运行环境：
-- OpenClaw Gateway: live，ws://127.0.0.1:18789
-- Ollama: 运行中，embedding 模型已自动探测
-- LanceDB: `LANCEDB_MODE=real` 可用（embedded，~/.openclaw/memory/lancedb）
-- Obsidian: MockAdapter（需安装 Local REST API 插件）
-- Evolver: MockAdapter（OpenClaw sub-agent 配置 TODO）
+| 系统 | 状态 | 说明 |
+|---|---|---|
+| OpenClaw Gateway | ✅ live | ws://127.0.0.1:18789，v3 握手认证 |
+| LanceDB | ✅ real | nomic-embed-text 语义搜索，50 条初始记忆 |
+| Ollama | ✅ 运行 | nomic-embed-text + mxbai-embed-large |
+| Obsidian | ✅/🟡 | 桌面端已安装，REST API 需启动 Obsidian 后可用 |
+| WeChat | ✅ | ClawBot 官方插件，通知推送渠道 |
+| 飞书 | ✅/🟡 | lark-cli 已配置，OpenClaw channel 需确认飞书应用凭据/机器人权限 |
+| Evolver | ✅/🟡 | Skill 已注册，sub-agent 触发待验证 |
 
-启动命令（完整 live 模式，`OPENCLAW_TOKEN` 需由 shell/session 安全注入）：
-`OPENCLAW_MODE=live LANCEDB_MODE=real pnpm dev`
+## 启动命令
+
+完整 live 模式（推荐）：
+`OPENCLAW_MODE=live LANCEDB_MODE=real OBSIDIAN_MODE=real pnpm dev`
+
+注意：Obsidian REST API 需要先启动 Obsidian 桌面端才可用。
 
 ## 执行指令
 

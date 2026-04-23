@@ -3,6 +3,7 @@ import type {
   Conversation,
   Notification,
   NotificationFilter,
+  NotifyInput,
   SendMessageInput,
   Skill,
   SkillDetail,
@@ -28,6 +29,7 @@ export interface OpenClawAdapter {
   rollbackSkill(nameOrId: string, patchId?: string): Promise<void>
   listNotifications(filter?: NotificationFilter): Promise<Notification[]>
   actionNotification(id: string, action: string): Promise<void>
+  sendNotification(channel: 'weixin' | 'feishu', message: NotifyInput): Promise<void>
   listConversations(): Promise<Conversation[]>
   sendMessage(input: SendMessageInput): Promise<void>
   subscribe(handler: (event: SystemEvent) => void): () => void

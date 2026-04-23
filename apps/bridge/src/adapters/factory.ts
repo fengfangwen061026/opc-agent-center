@@ -8,6 +8,7 @@ import type { ObsidianAdapter } from './ObsidianAdapter'
 import type { OpenClawAdapter } from './OpenClawAdapter'
 import { MockOpenClawAdapter } from './MockOpenClawAdapter'
 import { RealLanceDBAdapter } from './RealLanceDBAdapter'
+import { RealObsidianAdapter } from './RealObsidianAdapter'
 import { WsOpenClawAdapter } from './WsOpenClawAdapter'
 
 export function createOpenClawAdapter(env: BridgeEnv): OpenClawAdapter {
@@ -58,7 +59,26 @@ export function createEvolverAdapter(): EvolverAdapter {
   return new MockEvolverAdapter()
 }
 
-export function createObsidianAdapter(): ObsidianAdapter {
-  // TODO: Replace with a Local REST API adapter when Obsidian Local REST is reachable.
-  return new MockObsidianAdapter()
+export async function createObsidianAdapter(env: BridgeEnv): Promise<ObsidianAdapter> {
+  const config = {
+    apiUrl: env.obsidianApiUrl,
+    apiKey: env.obsidianApiKey,
+  }
+
+  if (env.obsidianMode === 'real') {
+    const adapter = new RealObsidianAdapter()
+    await adapter.connect(config)
+    if (adapter.isConnected()) {
+      return adapter
+    }
+
+    console.warn('[bridge] Obsidian real adapter failed, falling back to mock')
+    const mock = new MockObsidianAdapter()
+    await mock.connect()
+    return mock
+  }
+
+  const mock = new MockObsidianAdapter()
+  await mock.connect()
+  return mock
 }

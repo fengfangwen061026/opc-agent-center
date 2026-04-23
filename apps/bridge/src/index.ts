@@ -1,6 +1,11 @@
 import type { Server } from 'node:http'
 import { serve } from '@hono/node-server'
-import { createEvolverAdapter, createLanceDBAdapter, createObsidianAdapter, createOpenClawAdapter } from './adapters/factory'
+import {
+  createEvolverAdapter,
+  createLanceDBAdapter,
+  createObsidianAdapter,
+  createOpenClawAdapter,
+} from './adapters/factory'
 import { loadEnv, sanitizeLog } from './env'
 import { attachEventWebSocket } from './routes/events'
 import { createApp } from './server'
@@ -9,14 +14,10 @@ const env = loadEnv()
 const adapter = createOpenClawAdapter(env)
 const memoryAdapter = await createLanceDBAdapter(env)
 const evolverAdapter = createEvolverAdapter()
-const obsidianAdapter = createObsidianAdapter()
+const obsidianAdapter = await createObsidianAdapter(env)
 
 await adapter.connect()
 await evolverAdapter.connect()
-await obsidianAdapter.connect({
-  apiUrl: env.obsidianApiUrl,
-  apiKey: env.obsidianApiKey,
-})
 
 const app = createApp({
   adapter,
@@ -49,13 +50,20 @@ console.log(
     ollamaUrl: env.ollamaUrl,
     embeddingModel: env.embeddingModel,
     lancedbMode: env.lancedbMode,
+    obsidianMode: env.obsidianMode,
     obsidianApiUrl: env.obsidianApiUrl,
     hasToken: Boolean(env.token),
+    hasObsidianApiKey: Boolean(env.obsidianApiKey),
   }),
 )
 
 const shutdown = async () => {
-  await Promise.all([adapter.disconnect(), memoryAdapter.disconnect(), evolverAdapter.disconnect(), obsidianAdapter.disconnect()])
+  await Promise.all([
+    adapter.disconnect(),
+    memoryAdapter.disconnect(),
+    evolverAdapter.disconnect(),
+    obsidianAdapter.disconnect(),
+  ])
   server.close()
 }
 

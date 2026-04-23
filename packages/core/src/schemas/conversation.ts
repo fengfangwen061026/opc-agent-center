@@ -6,6 +6,8 @@ export const ConversationChannelSchema = z.enum([
   'telegram',
   'whatsapp',
   'discord',
+  'feishu',
+  'weixin',
   'web',
 ])
 

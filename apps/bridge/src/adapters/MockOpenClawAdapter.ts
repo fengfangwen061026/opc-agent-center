@@ -6,6 +6,7 @@ import type {
   ConversationMessage,
   Notification,
   NotificationFilter,
+  NotifyInput,
   SendMessageInput,
   Skill,
   SkillDetail,
@@ -154,23 +155,27 @@ export class MockOpenClawAdapter implements OpenClawAdapter {
     }))
     this.skills = SkillListSchema.parse(await readMock('skills.json'))
     this.notifications = NotificationListSchema.parse(await readMock('notifications.json'))
-    this.conversations = ConversationListSchema.parse(await readMock('conversations.json')).map((conversation, index) => ({
-      ...conversation,
-      channel: index === 0 ? 'web' : index === 1 ? 'discord' : 'telegram',
-      unreadCount: index,
-      messages: conversation.messages.map((message, messageIndex) => ({
-        ...message,
-        channel: index === 0 ? 'web' : index === 1 ? 'discord' : 'telegram',
-        type:
-          message.role === 'tool'
-            ? 'skill_invocation'
-            : message.taskId
-              ? 'task_report'
-              : messageIndex === conversation.messages.length - 1 && index === 1
-                ? 'approval_request'
-                : 'text',
-      })),
-    }))
+    this.conversations = ConversationListSchema.parse(await readMock('conversations.json')).map((conversation, index) => {
+      const channel = conversation.channel === 'default' ? (index === 0 ? 'web' : index === 1 ? 'discord' : 'telegram') : conversation.channel
+
+      return {
+        ...conversation,
+        channel,
+        unreadCount: index,
+        messages: conversation.messages.map((message, messageIndex) => ({
+          ...message,
+          channel: message.channel === 'default' ? channel : message.channel,
+          type:
+            message.role === 'tool'
+              ? 'skill_invocation'
+              : message.taskId
+                ? 'task_report'
+                : messageIndex === conversation.messages.length - 1 && index === 1
+                  ? 'approval_request'
+                  : 'text',
+        })),
+      }
+    })
     this.events = SystemEventListSchema.parse(await readMock('events.json'))
     this.connected = true
     this.startEventPump()
@@ -346,6 +351,20 @@ export class MockOpenClawAdapter implements OpenClawAdapter {
       source: 'bridge',
       timestamp: nowIso(),
       metadata: { id, action },
+    })
+  }
+
+  async sendNotification(channel: 'weixin' | 'feishu', message: NotifyInput): Promise<void> {
+    console.log('[mock] notify', channel, message.title)
+    this.emit({
+      id: `event-notify-${channel}-${Date.now()}`,
+      type: 'notification.pushed',
+      title: `${message.title} pushed to ${channel}`,
+      message: message.body,
+      level: message.priority === 'high' ? 'warn' : 'info',
+      source: 'bridge',
+      timestamp: nowIso(),
+      metadata: { channel, notificationType: message.type },
     })
   }
 

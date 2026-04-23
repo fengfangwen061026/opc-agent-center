@@ -4,6 +4,7 @@ dist/
 .env.*
 !.env.example
 !apps/**/.env.example
+apps/bridge/.env.local
 *.local
 .DS_Store
 ~/.openclaw/memory/lancedb/

@@ -21,6 +21,10 @@ function channelIcon(channel: Conversation['channel']) {
       return 'WA'
     case 'discord':
       return 'DC'
+    case 'feishu':
+      return 'FS'
+    case 'weixin':
+      return 'WX'
     default:
       return 'OP'
   }
@@ -70,8 +74,14 @@ function MessageBubble({ message }: { message: ConversationMessage }) {
 }
 
 export function ChatPage({ unmatched = false }: ChatPageProps) {
-  const { conversations, activeConversationId, setActiveConversation, messages, unreadCount, sendMessage } =
-    useConversationStore()
+  const {
+    conversations,
+    activeConversationId,
+    setActiveConversation,
+    messages,
+    unreadCount,
+    sendMessage,
+  } = useConversationStore()
   const { agents } = useAgentStore()
   const { skills } = useSkillStore()
   const { tasks } = useTaskStore()
@@ -88,9 +98,10 @@ export function ChatPage({ unmatched = false }: ChatPageProps) {
 
   const activeConversation = unmatched
     ? undefined
-    : conversations.find((conversation) => conversation.id === activeConversationId) ?? conversations[0]
+    : (conversations.find((conversation) => conversation.id === activeConversationId) ??
+      conversations[0])
   const activeMessages = useMemo(
-    () => (unmatched ? [] : messages[activeConversation?.id ?? ''] ?? []),
+    () => (unmatched ? [] : (messages[activeConversation?.id ?? ''] ?? [])),
     [activeConversation?.id, messages, unmatched],
   )
 
@@ -99,7 +110,8 @@ export function ChatPage({ unmatched = false }: ChatPageProps) {
     return tasks.filter((task) => taskIds.has(task.id) || task.status === 'running').slice(0, 4)
   }, [activeMessages, tasks])
 
-  const gatewayOffline = !bridgeOnline || health.gateway.status === 'disconnected' || health.gateway.status === 'error'
+  const gatewayOffline =
+    !bridgeOnline || health.gateway.status === 'disconnected' || health.gateway.status === 'error'
 
   const submit = async () => {
     if (gatewayOffline) return
@@ -139,7 +151,10 @@ export function ChatPage({ unmatched = false }: ChatPageProps) {
           placeholder="Search conversations"
           type="search"
         />
-        <button className="opc-conversation-row is-pinned" onClick={() => setActiveConversation('unmatched')}>
+        <button
+          className="opc-conversation-row is-pinned"
+          onClick={() => setActiveConversation('unmatched')}
+        >
           <span className="opc-channel-mark">UM</span>
           <span>
             <strong>Unmatched</strong>
@@ -164,7 +179,9 @@ export function ChatPage({ unmatched = false }: ChatPageProps) {
                   <small>{summarize(lastMessage)}</small>
                 </span>
                 {(unreadCount[conversation.id] ?? conversation.unreadCount) > 0 ? (
-                  <span className="opc-unread-badge">{unreadCount[conversation.id] ?? conversation.unreadCount}</span>
+                  <span className="opc-unread-badge">
+                    {unreadCount[conversation.id] ?? conversation.unreadCount}
+                  </span>
                 ) : null}
               </button>
             )
@@ -176,7 +193,9 @@ export function ChatPage({ unmatched = false }: ChatPageProps) {
         <div className="opc-chat-stream__header">
           <div>
             <p className="opc-eyebrow">{activeConversation?.channel ?? 'Unmatched'}</p>
-            <h1 className="opc-page-title">{unmatched ? 'Unmatched Messages' : activeConversation?.title}</h1>
+            <h1 className="opc-page-title">
+              {unmatched ? 'Unmatched Messages' : activeConversation?.title}
+            </h1>
           </div>
           <StatusPill status="connected" label="Bridge sync" />
         </div>
@@ -206,8 +225,16 @@ export function ChatPage({ unmatched = false }: ChatPageProps) {
               rows={3}
             />
             <div className="opc-chat-composer__actions">
-              <LiquidButton variant="ghost" icon={<AtSign />} onClick={() => setAgentPickerOpen((value) => !value)} />
-              <LiquidButton variant="ghost" icon={<Slash />} onClick={() => setSkillPickerOpen((value) => !value)} />
+              <LiquidButton
+                variant="ghost"
+                icon={<AtSign />}
+                onClick={() => setAgentPickerOpen((value) => !value)}
+              />
+              <LiquidButton
+                variant="ghost"
+                icon={<Slash />}
+                onClick={() => setSkillPickerOpen((value) => !value)}
+              />
               <LiquidButton icon={<Send />} onClick={submit} disabled={gatewayOffline}>
                 Send
               </LiquidButton>
@@ -216,7 +243,11 @@ export function ChatPage({ unmatched = false }: ChatPageProps) {
           {agentPickerOpen ? (
             <GlassCard className="opc-picker-popover">
               {agents.map((agent) => (
-                <button key={agent.id} type="button" onClick={() => setDraft((value) => `${value} ${agent.name}`)}>
+                <button
+                  key={agent.id}
+                  type="button"
+                  onClick={() => setDraft((value) => `${value} ${agent.name}`)}
+                >
                   <MessageCircle />
                   {agent.displayName}
                 </button>
@@ -226,7 +257,11 @@ export function ChatPage({ unmatched = false }: ChatPageProps) {
           {skillPickerOpen ? (
             <GlassCard className="opc-picker-popover is-skill">
               {skills.map((skill) => (
-                <button key={skill.id} type="button" onClick={() => setDraft((value) => `${value} ${skill.id}`)}>
+                <button
+                  key={skill.id}
+                  type="button"
+                  onClick={() => setDraft((value) => `${value} ${skill.id}`)}
+                >
                   <ShieldCheck />
                   {skill.name}
                 </button>
