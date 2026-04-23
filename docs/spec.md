@@ -483,7 +483,7 @@ export const EvolverLogEntrySchema = z.object({
 3. S3/S4 动作必须经通知中心审批
 4. 所有新数据结构必须有 Zod schema（packages/core）
 5. Secrets/token 不进前端明文/localStorage/日志
-6. 不引入 n8n / Zapier / Electron / Tauri
+6. 不引入 n8n / Zapier / Make 固定 DAG 流程；内容发布、代码推送、生产部署等高风险动作必须经审批后执行，不允许全自动
 7. LanceDB 数据目录不进 Git（.gitignore）
 8. Evolver 归档文件（.jsonl）不进 Git
 9. Ollama 和 LanceDB 均为可选依赖，不可用时降级而非崩溃
