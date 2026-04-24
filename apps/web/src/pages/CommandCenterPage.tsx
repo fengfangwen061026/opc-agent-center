@@ -70,6 +70,7 @@ export function CommandCenterPage() {
     : 0
   const pendingPatches = evolverStatus?.pendingPatches ?? pendingPatchCount
   const weeklyAutoPatches = evolverStatus?.weeklyAutoPatches ?? health.evolver.weeklyAutoPatches
+  const evolverSource = evolverStatus?.source ?? health.evolver.source
 
   return (
     <div className="opc-page opc-dashboard-page">
@@ -93,7 +94,11 @@ export function CommandCenterPage() {
               className="opc-metric-link"
               onClick={() => navigate('/notifications?type=skill_patch_pending')}
             >
-              {pendingPatches} pending · {weeklyAutoPatches} auto this week · {daysUntilNextRun} 天后
+              {evolverSource === 'live-connected'
+                ? `${pendingPatches} pending · ${weeklyAutoPatches} auto this week · ${daysUntilNextRun} 天后`
+                : evolverSource === 'protocol-unconfirmed'
+                  ? '协议未确认 · 当前禁用真实 Evolver'
+                  : '当前使用 mock/disabled 状态'}
             </button>
           }
           accentColor="var(--opc-lavender)"
@@ -102,7 +107,11 @@ export function CommandCenterPage() {
         <MetricCard
           title="LanceDB"
           value={health.lancedb.connected ? 'connected' : 'offline'}
-          subtitle={`${health.lancedb.totalEntries} memory entries`}
+          subtitle={
+            health.lancedb.source === 'live-connected'
+              ? `${health.lancedb.totalEntries} memory entries`
+              : 'mock/fallback memory data'
+          }
           accentColor="var(--opc-mint)"
           icon={<Database />}
         />

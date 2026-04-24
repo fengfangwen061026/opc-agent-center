@@ -1,6 +1,8 @@
 {
   "name": "@opc/electron",
   "version": "0.1.0",
+  "description": "OPC Agent Center desktop runtime",
+  "author": "OPC Agent Center",
   "private": true,
   "main": "dist/main.js",
   "scripts": {
@@ -9,10 +11,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
     "test": "node -e \"process.exit(0)\"",
-    "electron-builder": "electron-builder"
-  },
-  "dependencies": {
-    "@opc/bridge": "workspace:*"
+    "electron-builder": "node scripts/run-builder.cjs"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",

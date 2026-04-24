@@ -15,6 +15,7 @@ export const EvolverLogEntrySchema = z.object({
 
 export const EvolverStatusSchema = z.object({
   status: z.enum(['idle', 'running', 'error', 'disabled']),
+  source: z.enum(['mock', 'live-connected', 'live-unavailable', 'protocol-unconfirmed']),
   lastRun: z.string().datetime().optional(),
   nextRun: z.string().datetime().optional(),
   pendingPatches: z.number().nonnegative(),

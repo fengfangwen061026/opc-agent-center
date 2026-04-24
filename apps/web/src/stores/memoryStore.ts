@@ -12,10 +12,14 @@ interface MemoryFilter {
   searchMode: 'semantic' | 'exact'
 }
 
+export type MemorySourceStatus = 'live' | 'bridge-offline-fallback' | 'optimistic-local'
+
 interface MemoryStore {
   entries: MemoryEntry[]
   total: number
   stats: MemoryStats | null
+  source: MemorySourceStatus
+  statusMessage?: string
   selectedId: string | null
   filter: MemoryFilter
   evolverLog: EvolverLogEntry[]
@@ -32,8 +36,12 @@ interface MemoryStore {
   setSelected: (id: string | null) => void
 }
 
-const mockEntries = memoryData as MemoryEntry[]
-const mockLog = evolverLogData as EvolverLogEntry[]
+function cloneData<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T
+}
+
+let fallbackEntries = cloneData(memoryData as MemoryEntry[])
+let fallbackLog = cloneData(evolverLogData as EvolverLogEntry[])
 
 function deriveStats(entries: MemoryEntry[]): MemoryStats {
   const active = entries.filter((entry) => !entry.archived_at)
@@ -46,14 +54,129 @@ function deriveStats(entries: MemoryEntry[]): MemoryStats {
     },
     archived: entries.length - active.length,
     core: active.filter((entry) => entry.is_core).length,
-    lastUpdated: entries.reduce((latest, entry) => (entry.updated_at > latest ? entry.updated_at : latest), new Date().toISOString()),
+    lastUpdated: entries.reduce(
+      (latest, entry) => (entry.updated_at > latest ? entry.updated_at : latest),
+      new Date().toISOString(),
+    ),
   }
 }
 
-export const useMemoryStore = create<MemoryStore>((set, get) => ({
-  entries: mockEntries.filter((entry) => !entry.archived_at),
-  total: mockEntries.filter((entry) => !entry.archived_at).length,
-  stats: deriveStats(mockEntries),
+function applyFilter(entries: MemoryEntry[], filter: MemoryFilter): MemoryEntry[] {
+  const tags = new Set(filter.tags)
+  return entries
+    .filter((entry) => (filter.includeArchived ? true : !entry.archived_at))
+    .filter((entry) => (filter.type ? entry.type === filter.type : true))
+    .filter((entry) => (tags.size === 0 ? true : entry.tags.some((tag) => tags.has(tag))))
+    .sort((left, right) => right.updated_at.localeCompare(left.updated_at))
+}
+
+function keywordSearch(entries: MemoryEntry[], query: string): MemoryEntry[] {
+  const needle = query.trim().toLowerCase()
+  if (!needle) {
+    return []
+  }
+
+  return entries
+    .filter((entry) =>
+      `${entry.content} ${entry.tags.join(' ')} ${entry.source}`.toLowerCase().includes(needle),
+    )
+    .sort((left, right) => right.updated_at.localeCompare(left.updated_at))
+}
+
+function deriveFallbackView(filter: MemoryFilter): { entries: MemoryEntry[]; total: number } {
+  const searchQuery = filter.searchQuery.trim()
+  if (!searchQuery) {
+    const entries = applyFilter(fallbackEntries, filter)
+    return { entries, total: entries.length }
+  }
+
+  const base =
+    filter.searchMode === 'exact'
+      ? keywordSearch(fallbackEntries, searchQuery)
+      : keywordSearch(fallbackEntries, searchQuery)
+
+  const entries = applyFilter(base, filter)
+  return { entries, total: entries.length }
+}
+
+function keywordFilter(entries: MemoryEntry[], query: string): MemoryEntry[] {
+  const needle = query.trim().toLowerCase()
+  if (!needle) {
+    return entries
+  }
+
+  return entries.filter((entry) =>
+    `${entry.content} ${entry.tags.join(' ')} ${entry.source}`.toLowerCase().includes(needle),
+  )
+}
+
+function refreshFallbackState(filter: MemoryFilter) {
+  const view = deriveFallbackView(filter)
+  return {
+    entries: view.entries,
+    total: view.total,
+    stats: deriveStats(fallbackEntries),
+  }
+}
+
+function applyFallbackPatch(
+  id: string,
+  patch: Omit<Partial<MemoryEntry>, 'archived_at'> & { archived_at?: string | null },
+) {
+  fallbackEntries = fallbackEntries.map((entry) =>
+    entry.id === id
+      ? {
+          ...entry,
+          ...patch,
+          archived_at:
+            patch.archived_at === null ? undefined : (patch.archived_at ?? entry.archived_at),
+          updated_at: new Date().toISOString(),
+        }
+      : entry,
+  )
+}
+
+function appendFallbackArchiveLog(id: string, summary: string, reason: string) {
+  fallbackLog = [
+    {
+      id: crypto.randomUUID(),
+      type: 'archive',
+      timestamp: new Date().toISOString(),
+      summary,
+      reason,
+      affected_ids: [id],
+    },
+    ...fallbackLog,
+  ]
+}
+
+export const useMemoryStore = create<MemoryStore>((set, get) => {
+  const refreshVisibleEntries = async () => {
+    const { filter } = get()
+    if (filter.searchQuery.trim()) {
+      await get().search(filter.searchQuery)
+      return
+    }
+
+    await get().fetchEntries()
+  }
+
+  return {
+  entries: applyFilter(fallbackEntries, {
+    tags: [],
+    includeArchived: false,
+    searchQuery: '',
+    searchMode: 'semantic',
+  }),
+  total: applyFilter(fallbackEntries, {
+    tags: [],
+    includeArchived: false,
+    searchQuery: '',
+    searchMode: 'semantic',
+  }).length,
+  stats: deriveStats(fallbackEntries),
+  source: 'bridge-offline-fallback',
+  statusMessage: 'Bridge offline; showing local fallback data.',
   selectedId: null,
   filter: {
     tags: [],
@@ -61,7 +184,7 @@ export const useMemoryStore = create<MemoryStore>((set, get) => ({
     searchQuery: '',
     searchMode: 'semantic',
   },
-  evolverLog: mockLog,
+  evolverLog: fallbackLog,
   viewMode: 'list',
   fetchEntries: async () => {
     const { filter } = get()
@@ -73,23 +196,28 @@ export const useMemoryStore = create<MemoryStore>((set, get) => ({
       })
       if (filter.type) params.set('type', filter.type)
       if (filter.tags.length > 0) params.set('tags', filter.tags.join(','))
-      const result = await fetchBridge<{ entries: MemoryEntry[]; total: number }>(`/api/memory?${params.toString()}`)
-      set({ entries: result.entries, total: result.total })
+      const result = await fetchBridge<{ entries: MemoryEntry[]; total: number }>(
+        `/api/memory?${params.toString()}`,
+      )
+      set({ entries: result.entries, total: result.total, source: 'live', statusMessage: undefined })
     } catch {
-      const tags = new Set(filter.tags)
-      const fallback = mockEntries
-        .filter((entry) => (filter.includeArchived ? true : !entry.archived_at))
-        .filter((entry) => (filter.type ? entry.type === filter.type : true))
-        .filter((entry) => (tags.size === 0 ? true : entry.tags.some((tag) => tags.has(tag))))
-      set({ entries: fallback, total: fallback.length })
+      set({
+        ...refreshFallbackState(filter),
+        source: 'bridge-offline-fallback',
+        statusMessage: 'Bridge offline; showing local fallback data.',
+      })
     }
   },
   fetchStats: async () => {
     try {
       const stats = await fetchBridge<MemoryStats>('/api/memory/stats')
-      set({ stats })
+      set({ stats, source: 'live', statusMessage: undefined })
     } catch {
-      set({ stats: deriveStats(mockEntries) })
+      set({
+        stats: deriveStats(fallbackEntries),
+        source: 'bridge-offline-fallback',
+        statusMessage: 'Bridge offline; showing local fallback data.',
+      })
     }
   },
   search: async (query) => {
@@ -99,79 +227,118 @@ export const useMemoryStore = create<MemoryStore>((set, get) => ({
       return
     }
 
+    const { filter } = get()
     try {
-      const entries = await fetchBridge<MemoryEntry[]>(`/api/memory/search?q=${encodeURIComponent(query)}&limit=50`)
-      set({ entries, total: entries.length })
-    } catch {
-      const needle = query.toLowerCase()
-      const entries = mockEntries.filter(
-        (entry) =>
-          !entry.archived_at &&
-          (`${entry.content} ${entry.tags.join(' ')} ${entry.source}`.toLowerCase().includes(needle)),
+      if (filter.searchMode === 'exact') {
+        const params = new URLSearchParams({
+          page: '1',
+          pageSize: '200',
+          includeArchived: String(filter.includeArchived),
+        })
+        if (filter.type) params.set('type', filter.type)
+        if (filter.tags.length > 0) params.set('tags', filter.tags.join(','))
+        const result = await fetchBridge<{ entries: MemoryEntry[]; total: number }>(
+          `/api/memory?${params.toString()}`,
+        )
+        const entries = keywordFilter(result.entries, query)
+        set({ entries, total: entries.length, source: 'live', statusMessage: undefined })
+        return
+      }
+
+      const entries = await fetchBridge<MemoryEntry[]>(
+        `/api/memory/search?q=${encodeURIComponent(query)}&limit=50`,
       )
-      set({ entries, total: entries.length })
+      set({ entries, total: entries.length, source: 'live', statusMessage: undefined })
+    } catch {
+      const view = deriveFallbackView({ ...filter, searchQuery: query })
+      set({
+        entries: view.entries,
+        total: view.total,
+        source: 'bridge-offline-fallback',
+        statusMessage: 'Bridge offline; search is using local fallback data.',
+      })
     }
   },
   updateEntry: async (id, patch) => {
-    set((state) => {
-      const entries = state.entries.map((entry) =>
+    set((state) => ({
+      entries: state.entries.map((entry) =>
         entry.id === id ? { ...entry, ...patch, updated_at: new Date().toISOString() } : entry,
-      )
-      return { entries, stats: state.stats ? deriveStats([...mockEntries, ...entries]) : state.stats }
-    })
+      ),
+    }))
+
     try {
-      const entry = await fetchBridge<MemoryEntry>(`/api/memory/${id}`, {
+      await fetchBridge<MemoryEntry>(`/api/memory/${id}`, {
         method: 'PATCH',
         body: JSON.stringify(patch),
       })
-      set((state) => ({
-        entries: state.entries.map((item) => (item.id === id ? entry : item)),
-      }))
-      await get().fetchStats()
+      await Promise.all([refreshVisibleEntries(), get().fetchStats()])
     } catch {
-      // Optimistic local state is retained when Bridge is offline.
+      applyFallbackPatch(id, patch)
+      set((state) => ({
+        ...refreshFallbackState(state.filter),
+        source: 'optimistic-local',
+        statusMessage: 'Bridge save failed; this edit is local only and not persisted.',
+      }))
     }
   },
   softDelete: async (id) => {
     const archivedAt = new Date().toISOString()
     set((state) => {
       const entries = state.filter.includeArchived
-        ? state.entries.map((entry) => (entry.id === id ? { ...entry, archived_at: archivedAt } : entry))
+        ? state.entries.map((entry) =>
+            entry.id === id ? { ...entry, archived_at: archivedAt, updated_at: archivedAt } : entry,
+          )
         : state.entries.filter((entry) => entry.id !== id)
       return { entries, selectedId: state.selectedId === id ? null : state.selectedId }
     })
+
     try {
       await fetchBridge(`/api/memory/${id}`, { method: 'DELETE' })
-      await Promise.all([get().fetchStats(), get().fetchEvolverLog()])
+      await Promise.all([refreshVisibleEntries(), get().fetchStats(), get().fetchEvolverLog()])
     } catch {
-      // Local soft delete remains visible as fallback behavior.
+      applyFallbackPatch(id, { archived_at: archivedAt })
+      appendFallbackArchiveLog(id, `Soft deleted memory ${id.slice(-8)}.`, 'Offline fallback soft delete')
+      set((state) => ({
+        ...refreshFallbackState(state.filter),
+        source: 'optimistic-local',
+        statusMessage: 'Bridge delete failed; this archive is local only and not persisted.',
+        selectedId: state.selectedId === id ? null : state.selectedId,
+        evolverLog: fallbackLog,
+      }))
     }
   },
   restore: async (id) => {
     try {
-      const entry = await fetchBridge<MemoryEntry>(`/api/memory/${id}`, {
+      await fetchBridge<MemoryEntry>(`/api/memory/${id}`, {
         method: 'PATCH',
         body: JSON.stringify({ archived_at: null }),
       })
-      set((state) => ({
-        entries: state.entries.map((item) => (item.id === id ? entry : item)),
-      }))
-      await Promise.all([get().fetchEntries(), get().fetchStats(), get().fetchEvolverLog()])
+      await Promise.all([refreshVisibleEntries(), get().fetchStats(), get().fetchEvolverLog()])
     } catch {
+      applyFallbackPatch(id, { archived_at: null })
       set((state) => ({
-        entries: state.entries.map((entry) => (entry.id === id ? { ...entry, archived_at: undefined } : entry)),
+        ...refreshFallbackState(state.filter),
+        source: 'optimistic-local',
+        statusMessage: 'Bridge restore failed; this restore is local only and not persisted.',
       }))
     }
   },
   fetchEvolverLog: async () => {
     try {
-      const result = await fetchBridge<{ entries: EvolverLogEntry[]; total: number }>('/api/memory/evolver-log?page=1&pageSize=50')
-      set({ evolverLog: result.entries })
+      const result = await fetchBridge<{ entries: EvolverLogEntry[]; total: number }>(
+        '/api/memory/evolver-log?page=1&pageSize=50',
+      )
+      set({ evolverLog: result.entries, source: 'live', statusMessage: undefined })
     } catch {
-      set({ evolverLog: mockLog })
+      set({
+        evolverLog: fallbackLog,
+        source: 'bridge-offline-fallback',
+        statusMessage: 'Bridge offline; Evolver log is local fallback data.',
+      })
     }
   },
   setFilter: (partial) => set((state) => ({ filter: { ...state.filter, ...partial } })),
   setViewMode: (viewMode) => set({ viewMode }),
   setSelected: (selectedId) => set({ selectedId }),
-}))
+  }
+})

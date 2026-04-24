@@ -29,19 +29,19 @@ OpenClaw 负责执行编排，Evolver 负责系统进化，Obsidian 是知识库
 └──────┬──────────┬──────────┬────────────┬───────────────────┘
        │          │          │            │
   OpenClaw    LanceDB    Obsidian      Evolver
-  Gateway    :8080/local   Vault      sub-agent
+  Gateway    embedded      Vault      sub-agent
   :18789     Ollama:11434
 ```
 
 ### 2.1 外部系统依赖
 
-| 系统             | 角色           | 接入方式                       | 离线降级         |
-| ---------------- | -------------- | ------------------------------ | ---------------- |
-| OpenClaw Gateway | 执行中枢       | WebSocket ws://127.0.0.1:18789 | MockAdapter      |
-| LanceDB          | 本地向量记忆库 | HTTP :8080 或 embedded         | 内存临时存储     |
-| Ollama           | Embedding 模型 | HTTP :11434                    | 关闭 auto-recall |
-| Obsidian         | 知识库         | Local REST Plugin :27123       | 写入本地队列     |
-| Evolver          | 进化 sub-agent | OpenClaw sub-agent API         | 禁用进化功能     |
+| 系统             | 角色           | 接入方式                       | 离线降级                                      |
+| ---------------- | -------------- | ------------------------------ | --------------------------------------------- |
+| OpenClaw Gateway | 执行中枢       | WebSocket ws://127.0.0.1:18789 | MockAdapter                                   |
+| LanceDB          | 本地向量记忆库 | embedded                       | MockAdapter（连接失败）/ 关键词召回（仅 Ollama 不可用） |
+| Ollama           | Embedding 模型 | HTTP :11434                    | 关闭 semantic recall，CRUD 仍走 real path     |
+| Obsidian         | 知识库         | Local REST Plugin :27123       | 写入本地队列                                  |
+| Evolver          | 进化 sub-agent | OpenClaw sub-agent API         | 禁用进化功能                                  |
 
 ---
 
@@ -290,14 +290,27 @@ WS   /ws/events                     # 实时事件流
 ```typescript
 export const SystemHealthSchema = z.object({
   gateway: ConnectionStatusSchema,
-  lancedb: ConnectionStatusSchema,
+  lancedb: z.object({
+    connected: z.boolean(),
+    ollamaReachable: z.boolean(),
+    embeddingModel: z.string().nullable(),
+    source: z.enum(['mock', 'live-connected', 'live-unavailable']),
+    semanticSearch: z.enum(['vector', 'keyword-fallback']),
+    totalEntries: z.number(),
+  }),
   ollama: ConnectionStatusSchema,
-  obsidian: ConnectionStatusSchema,
+  obsidian: z.object({
+    connected: z.boolean(),
+    vaultName: z.string().nullable(),
+    fileCount: z.number(),
+  }),
   evolver: z.object({
-    status: z.enum(['idle', 'running', 'error']),
+    status: z.enum(['idle', 'running', 'error', 'disabled']),
+    source: z.enum(['mock', 'live-connected', 'live-unavailable', 'protocol-unconfirmed']),
     lastRun: z.string().datetime().optional(),
     nextRun: z.string().datetime().optional(),
     pendingPatches: z.number(),
+    weeklyAutoPatches: z.number(),
   }),
   memory: z.object({
     totalEntries: z.number(),
@@ -498,7 +511,7 @@ export const EvolverLogEntrySchema = z.object({
 - Evolver 的 Ollama embedding 调用不记录 memory 内容到日志
 - Memory 面板的编辑操作需要操作确认（防误操作）
 
-### Phase 13：Electron 桌面应用（新）
+### Phase 13：Electron 桌面应用（scaffold completed, runtime hardening pending）
 
 **目标**：将前端 + Bridge 打包成独立桌面应用，产出 .app / .exe / .AppImage。
 
@@ -525,6 +538,32 @@ export const EvolverLogEntrySchema = z.object({
 - [ ] 窗口关闭时 Bridge 子进程正常退出（无僵尸进程）
 - [ ] Bridge 异常退出时 Electron 自动重启（最多 3 次）
 - [ ] pnpm electron:build 无报错（需先 pnpm build 构建 web 和 bridge）
+
+### Phase 14：Real Persistence & Desktop Runtime Hardening（当前）
+
+**目标**：把 Phase 12/13 的 live/fallback 能力从“脚手架可运行”推进到“真实持久化、真实可验证、Electron 可打包运行”。
+
+**任务清单**：
+
+1. Real LanceDB persistence
+   - Memory CRUD、list、stats、Evolver log 以 LanceDB embedded 表为真值。
+   - 表按 memory type 拆分：`episodic` / `semantic` / `procedural`，`evolver_log` 单独存审计记录。
+   - Ollama 不可用时不阻断 real CRUD，语义搜索降级为关键词搜索，health 暴露 `semanticSearch: keyword-fallback`。
+   - 旧 `memory-state.json` 只允许作为一次迁移输入；空库可显式通过 seed 开关从 `data/mock` 初始化。
+2. Fallback visibility
+   - 前端 Memory store 区分 `live` / `bridge-offline-fallback` / `optimistic-local`。
+   - Bridge 离线、LanceDB real 未连接、Ollama 离线必须在 Memory 页面明确提示。
+3. Electron runtime hardening
+   - packaged 模式加载 `resources/web/index.html`。
+   - Bridge 子进程从 `resources/bridge/index.js` fork。
+   - `OPC_MOCK_ROOT` 指向 `resources/data/mock`。
+   - pnpm workspace 依赖通过 packaged resources 可解析，特别是 `@opc/core` 和 LanceDB native optional deps。
+   - Bridge stop/start 不遗留子进程，手动重启重置 restartCount。
+4. Live protocol verification
+   - OpenClaw Gateway WebSocket adapter 为 confirmed adapter，但运行态依赖本机 Gateway。
+   - LanceDB embedded CRUD 为 confirmed；Ollama embedding 为 optional confirmed HTTP dependency。
+   - Obsidian Local REST adapter 为 confirmed adapter，运行态依赖桌面端和 Local REST API 插件。
+   - Evolver sub-agent REST endpoint 仍为 inferred/TODO；404 或不可达时 health 必须显示 `protocol-unconfirmed` / `live-unavailable`，不能静默伪装为 live idle。
 
 ---
 

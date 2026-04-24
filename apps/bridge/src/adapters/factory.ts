@@ -64,7 +64,11 @@ export async function createEvolverAdapter(env: BridgeEnv): Promise<EvolverAdapt
 
     try {
       await adapter.connect()
-      console.log('[evolver] real adapter connected')
+      console.log(
+        adapter.isConnected()
+          ? '[evolver] real adapter connected'
+          : '[evolver] real adapter unavailable; live status will report disabled',
+      )
       return adapter
     } catch (error) {
       console.warn('[evolver] real adapter unreachable, falling back to mock', error)

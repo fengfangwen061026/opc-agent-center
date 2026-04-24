@@ -6,6 +6,7 @@ import { envelope } from '../server'
 
 const MemoryPatchSchema = z.object({
   content: z.string().optional(),
+  type: MemoryTypeSchema.optional(),
   tags: z.array(z.string()).optional(),
   is_core: z.boolean().optional(),
   quality_score: z.number().min(0).max(1).optional(),

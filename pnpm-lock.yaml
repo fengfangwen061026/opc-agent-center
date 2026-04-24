@@ -69,12 +69,11 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+      vitest:
+        specifier: ^4.0.15
+        version: 4.1.5(@types/node@24.12.2)(vite@7.3.2(@types/node@24.12.2)(jiti@2.6.1)(tsx@4.21.0))
 
   apps/electron:
-    dependencies:
-      '@opc/bridge':
-        specifier: workspace:*
-        version: link:../bridge
     devDependencies:
       '@types/node':
         specifier: ^24.10.0
@@ -608,6 +607,7 @@ packages:
   '@lancedb/lancedb@0.27.2':
     resolution: {integrity: sha512-JQpZHV5KzUzDI3flYCjtZcfHlEbL8lM54E0NT+jrRYe29aKYegfavvPsAsuZp0VdcMwFMZcpMkaBhjQMo/fwvg==}
     engines: {node: '>= 18'}
+    cpu: [x64, arm64]
     os: [darwin, linux, win32]
     peerDependencies:
       apache-arrow: '>=15.0.0 <=18.1.0'

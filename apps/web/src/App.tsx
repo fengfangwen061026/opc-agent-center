@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import type { EvolverEvent } from '@opc/core'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, HashRouter, Route, Routes } from 'react-router-dom'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { PageLoader } from '@/components/PageLoader'
 import { AppShell } from '@/layouts/AppShell'
@@ -84,8 +84,10 @@ export default function App() {
     }
   }, [])
 
+  const Router = window.location.protocol === 'file:' ? HashRouter : BrowserRouter
+
   return (
-    <BrowserRouter>
+    <Router>
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route element={<AppShell />}>
@@ -108,6 +110,6 @@ export default function App() {
           </Route>
         </Routes>
       </Suspense>
-    </BrowserRouter>
+    </Router>
   )
 }

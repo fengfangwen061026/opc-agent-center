@@ -1,6 +1,7 @@
 appId: com.opc.agent-center
 productName: OPC 超级中枢
 copyright: OPC Agent Center
+beforeBuild: scripts/before-build.cjs
 
 directories:
   output: dist-app
@@ -8,7 +9,6 @@ directories:
 
 files:
   - dist/**/*
-  - node_modules/**/*
 
 extraResources:
   - from: ../../apps/web/dist
@@ -17,8 +17,12 @@ extraResources:
     to: bridge
   - from: ../../apps/bridge/package.json
     to: bridge/package.json
-  - from: ../../apps/bridge/node_modules
-    to: bridge/node_modules
+  - from: ../../packages/core/dist
+    to: bridge/node_modules/@opc/core/dist
+  - from: ../../packages/core/package.json
+    to: bridge/node_modules/@opc/core/package.json
+  - from: ../../node_modules
+    to: node_modules
   - from: ../../data/mock
     to: data/mock
 

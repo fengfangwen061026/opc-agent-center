@@ -9,7 +9,16 @@ import { useSystemHealthStore } from '@/stores/systemHealthStore'
 
 export function MemoryPage() {
   const { health } = useSystemHealthStore()
-  const { filter, viewMode, fetchEntries, fetchStats, fetchEvolverLog, selectedId } = useMemoryStore()
+  const {
+    filter,
+    viewMode,
+    fetchEntries,
+    fetchStats,
+    fetchEvolverLog,
+    selectedId,
+    source,
+    statusMessage,
+  } = useMemoryStore()
 
   useEffect(() => {
     void fetchStats()
@@ -26,11 +35,23 @@ export function MemoryPage() {
 
   return (
     <div className={`opc-page opc-memory-page ${selectedId ? 'has-selection' : ''}`}>
-      {!health.lancedb.ollamaReachable || !health.lancedb.embeddingModel ? (
+      {source !== 'live' ? (
+        <GlassCard className="opc-memory-offline is-critical" variant="soft" padding="sm">
+          {source === 'optimistic-local'
+            ? (statusMessage ?? '当前修改仅保存在本地 fallback，尚未真实持久化。')
+            : 'Bridge 离线：当前为本地 mock/fallback 数据，修改不会持久化。'}
+        </GlassCard>
+      ) : null}
+      {health.lancedb.source !== 'live-connected' ? (
+        <GlassCard className="opc-memory-offline is-critical" variant="soft" padding="sm">
+          LanceDB real 未连接：memory 为 mock/fallback，当前数据不是 live 持久化结果。
+        </GlassCard>
+      ) : null}
+      {health.lancedb.semanticSearch === 'keyword-fallback' ? (
         <GlassCard className="opc-memory-offline" variant="soft" padding="sm">
           {health.lancedb.ollamaReachable
-            ? 'Ollama 可达，但 nomic-embed-text 未安装；语义搜索使用 mock 关键词召回。'
-            : 'Ollama 未运行，语义召回已关闭；Memory CRUD 仍可使用 mock fallback。'}
+            ? 'Ollama 可达，但 embedding 模型不可用；语义搜索已降级为关键词召回。'
+            : 'Ollama 离线：语义搜索关闭，使用关键词搜索。'}
         </GlassCard>
       ) : null}
       <div className="opc-memory-layout">

@@ -4,6 +4,7 @@ import { WebSocketServer } from 'ws'
 import type { EvolverEvent, SystemEvent } from '@opc/core'
 import type { AppContext } from '../server'
 import { envelope } from '../server'
+import { buildSystemHealth } from '../systemHealth'
 
 function sendJson(socket: WebSocket, payload: unknown) {
   if (socket.readyState === socket.OPEN) {
@@ -65,7 +66,7 @@ export function attachEventWebSocket(server: Server, context: AppContext) {
   })
 
   wss.on('connection', async (socket) => {
-    const health = await context.adapter.getStatus()
+    const health = await buildSystemHealth(context)
     sendJson(socket, envelope({ type: 'system.health.snapshot', health }, context.mode))
 
     const unsubscribe = context.adapter.subscribe((event) => {

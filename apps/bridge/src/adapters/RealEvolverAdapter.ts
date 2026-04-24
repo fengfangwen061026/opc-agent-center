@@ -21,6 +21,8 @@ class EvolverHttpError extends Error {
   }
 }
 
+type LiveProtocolState = 'connected' | 'unavailable' | 'protocol-unconfirmed'
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value))
 }
@@ -94,14 +96,33 @@ export class RealEvolverAdapter implements EvolverAdapter {
   private handlers = new Set<(event: EvolverEvent) => void>()
   private pollTimer: NodeJS.Timeout | undefined
   private lastStatus: EvolverStatus | undefined
+  private protocolState: LiveProtocolState = 'unavailable'
+  private unavailableReason: string | undefined
 
   constructor(private readonly options: RealEvolverAdapterOptions) {}
 
   async connect(): Promise<void> {
-    const status = await this.getStatus()
-    this.connected = true
-    this.lastStatus = status
-    this.startPolling()
+    try {
+      const status = await this.fetchLiveStatus()
+      this.protocolState = 'connected'
+      this.unavailableReason = undefined
+      this.connected = true
+      this.lastStatus = status
+      this.startPolling()
+    } catch (error) {
+      this.connected = false
+      this.protocolState =
+        error instanceof EvolverHttpError && error.status === 404
+          ? 'protocol-unconfirmed'
+          : 'unavailable'
+      this.unavailableReason =
+        error instanceof Error ? error.message : 'Evolver live endpoint unavailable'
+      this.lastStatus = this.disabledStatus()
+      console.warn('[evolver] live protocol unavailable', {
+        state: this.protocolState,
+        reason: this.unavailableReason,
+      })
+    }
   }
 
   async disconnect(): Promise<void> {
@@ -114,12 +135,33 @@ export class RealEvolverAdapter implements EvolverAdapter {
   }
 
   async getStatus(): Promise<EvolverStatus> {
+    if (this.protocolState !== 'connected') {
+      return this.disabledStatus()
+    }
+
+    try {
+      const status = await this.fetchLiveStatus()
+      this.lastStatus = status
+      return status
+    } catch (error) {
+      this.connected = false
+      this.protocolState =
+        error instanceof EvolverHttpError && error.status === 404
+          ? 'protocol-unconfirmed'
+          : 'unavailable'
+      this.unavailableReason = error instanceof Error ? error.message : 'Evolver live endpoint unavailable'
+      return this.disabledStatus()
+    }
+  }
+
+  private async fetchLiveStatus(): Promise<EvolverStatus> {
     const raw = await this.fetchJson<unknown>('/api/subagents/evolver/status')
     const record = isRecord(raw) && isRecord(raw.data) ? raw.data : raw
     const status = isRecord(record) ? record : {}
 
     return EvolverStatusSchema.parse({
       status: statusFrom(status.status ?? status.state ?? status.phase),
+      source: 'live-connected',
       pendingPatches: numberFrom(
         status.pendingPatches ??
           status.pending_patches ??
@@ -144,6 +186,10 @@ export class RealEvolverAdapter implements EvolverAdapter {
   }
 
   async getPendingPatches(): Promise<SkillPatch[]> {
+    if (this.protocolState !== 'connected') {
+      return []
+    }
+
     try {
       const raw = await this.fetchJson<unknown>('/api/subagents/evolver/patches')
       return pendingSkillPatches(firstArray(raw))
@@ -156,6 +202,7 @@ export class RealEvolverAdapter implements EvolverAdapter {
   }
 
   async approvePatch(skillName: string, patchId: string): Promise<void> {
+    this.assertProtocolConfirmed()
     await this.fetchJson(`/api/subagents/evolver/patches/${encodeURIComponent(patchId)}/approve`, {
       method: 'POST',
       body: JSON.stringify({ skillName }),
@@ -163,6 +210,7 @@ export class RealEvolverAdapter implements EvolverAdapter {
   }
 
   async rejectPatch(skillName: string, patchId: string, reason?: string): Promise<void> {
+    this.assertProtocolConfirmed()
     await this.fetchJson(`/api/subagents/evolver/patches/${encodeURIComponent(patchId)}/reject`, {
       method: 'POST',
       body: JSON.stringify({ skillName, reason }),
@@ -170,6 +218,7 @@ export class RealEvolverAdapter implements EvolverAdapter {
   }
 
   async triggerEval(skillName: string): Promise<{ jobId: string }> {
+    this.assertProtocolConfirmed()
     const raw = await this.fetchJson<unknown>('/api/subagents/evolver/invoke', {
       method: 'POST',
       body: JSON.stringify({ action: 'eval', skillName }),
@@ -201,6 +250,31 @@ export class RealEvolverAdapter implements EvolverAdapter {
 
   isConnected(): boolean {
     return this.connected
+  }
+
+  private assertProtocolConfirmed(): void {
+    if (this.protocolState !== 'connected') {
+      throw new Error(`Evolver live protocol unavailable: ${this.protocolState}`)
+    }
+  }
+
+  private disabledStatus(): EvolverStatus {
+    return EvolverStatusSchema.parse({
+      status: 'disabled',
+      source:
+        this.protocolState === 'protocol-unconfirmed'
+          ? 'protocol-unconfirmed'
+          : 'live-unavailable',
+      pendingPatches: 0,
+      weeklyAutoPatches: 0,
+      autoPatchCountThisWeek: 0,
+      evalsThisWeek: 0,
+      memoryMaintenanceCount: 0,
+      lastError:
+        this.protocolState === 'protocol-unconfirmed'
+          ? 'OpenClaw Evolver sub-agent REST protocol is not confirmed.'
+          : (this.unavailableReason ?? 'Evolver live endpoint unavailable.'),
+    })
   }
 
   private async getPendingPatchesFromSkills() {

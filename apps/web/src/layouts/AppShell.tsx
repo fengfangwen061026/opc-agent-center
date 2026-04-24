@@ -83,13 +83,20 @@ export function AppShell() {
       {
         label: 'Evolver',
         status: mapEvolverStatus(evolverStatus?.status ?? health.evolver.status),
-        detail: `${evolverStatus?.pendingPatches ?? health.evolver.pendingPatches} pending patches`,
+        detail:
+          (evolverStatus?.source ?? health.evolver.source) === 'live-connected'
+            ? `${evolverStatus?.pendingPatches ?? health.evolver.pendingPatches} pending patches`
+            : (evolverStatus?.source ?? health.evolver.source) === 'protocol-unconfirmed'
+              ? '协议未确认'
+              : '当前使用 mock/disabled',
       },
     ],
     [
       evolverStatus?.pendingPatches,
+      evolverStatus?.source,
       evolverStatus?.status,
       health.evolver.pendingPatches,
+      health.evolver.source,
       health.evolver.status,
       health.gateway.message,
       health.gateway.status,
@@ -211,8 +218,13 @@ export function AppShell() {
                 status={mapEvolverStatus(evolverStatus?.status ?? health.evolver.status)}
               />
               <p className="opc-rail-copy">
-                {evolverStatus?.pendingPatches ?? health.evolver.pendingPatches} pending · next{' '}
-                {new Date(evolverStatus?.nextRun ?? health.evolver.nextRun ?? '').toLocaleString()}
+                {(evolverStatus?.source ?? health.evolver.source) === 'live-connected'
+                  ? `${evolverStatus?.pendingPatches ?? health.evolver.pendingPatches} pending · next ${new Date(
+                      evolverStatus?.nextRun ?? health.evolver.nextRun ?? '',
+                    ).toLocaleString()}`
+                  : (evolverStatus?.source ?? health.evolver.source) === 'protocol-unconfirmed'
+                    ? 'OpenClaw Evolver 协议未确认，当前禁用真实接入。'
+                    : '当前使用 mock/disabled Evolver 状态。'}
               </p>
             </div>
           </GlassCard>

@@ -12,6 +12,8 @@ export interface LanceDBStatus {
   connected: boolean
   ollamaReachable: boolean
   embeddingModel: string | null
+  source: 'mock' | 'live-connected' | 'live-unavailable'
+  semanticSearch: 'vector' | 'keyword-fallback'
   totalEntries: number
   byType: Record<MemoryType, number>
 }
@@ -26,6 +28,7 @@ export interface MemoryListParams {
 
 export interface MemoryUpdatePatch {
   content?: string
+  type?: MemoryType
   tags?: string[]
   is_core?: boolean
   quality_score?: number

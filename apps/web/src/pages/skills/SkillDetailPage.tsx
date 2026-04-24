@@ -21,7 +21,7 @@ export function SkillDetailPage() {
   const { name = '' } = useParams()
   const [searchParams] = useSearchParams()
   const { selectedSkill, evalResult, evalRunning, fetchSkill, updateSkill, runEval, rollbackSkill } = useSkillStore()
-  const { approvePatch, rejectPatch, triggerEval } = useEvolverStore()
+  const { status: evolverStatus, approvePatch, rejectPatch, triggerEval } = useEvolverStore()
   const initialTab = (searchParams.get('tab') as SkillTab | null) ?? 'overview'
   const [tab, setTab] = useState<SkillTab>(tabs.includes(initialTab) ? initialTab : 'overview')
   const configRef = useRef<HTMLTextAreaElement>(null)
@@ -153,6 +153,13 @@ export function SkillDetailPage() {
 
         {tab === 'evolution' ? (
           <div className="opc-detail-list">
+            {evolverStatus?.source !== 'live-connected' ? (
+              <p className="opc-warning-copy">
+                {evolverStatus?.source === 'protocol-unconfirmed'
+                  ? 'Evolver live 协议未确认；当前显示 mock/缓存 patch。'
+                  : '当前使用 mock/disabled Evolver，patch 状态不是 live 接入结果。'}
+              </p>
+            ) : null}
             {selectedSkill.evolver.patches.map((patch) => (
               <GlassCard key={patch.id} className="opc-patch-record">
                 <div className="opc-patch-record__header">
@@ -206,6 +213,13 @@ export function SkillDetailPage() {
 
         {tab === 'eval' ? (
           <div className="opc-detail-stack">
+            {evolverStatus?.source !== 'live-connected' ? (
+              <p className="opc-warning-copy">
+                {evolverStatus?.source === 'protocol-unconfirmed'
+                  ? 'Evolver 协议未确认；Run eval 会走 mock/fallback。'
+                  : 'Evolver 当前未 live 连接；Run eval 不代表真实 sub-agent 调用。'}
+              </p>
+            ) : null}
             <LiquidButton
               icon={<Sparkles />}
               onClick={() => {

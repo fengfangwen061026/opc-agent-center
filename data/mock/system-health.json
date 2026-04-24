@@ -11,6 +11,8 @@
     "connected": true,
     "ollamaReachable": false,
     "embeddingModel": null,
+    "source": "mock",
+    "semanticSearch": "keyword-fallback",
     "totalEntries": 50
   },
   "ollama": {
@@ -28,6 +30,7 @@
   },
   "evolver": {
     "status": "idle",
+    "source": "mock",
     "lastRun": "2026-04-21T19:00:00.000Z",
     "nextRun": "2026-04-26T19:00:00.000Z",
     "pendingPatches": 3,

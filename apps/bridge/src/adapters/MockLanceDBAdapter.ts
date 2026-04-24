@@ -1,8 +1,8 @@
 import { readFile } from 'node:fs/promises'
 import { randomUUID } from 'node:crypto'
 import { resolve } from 'node:path'
-import type { EvolverLogEntry, MemoryEntry, MemoryStats, MemoryType } from '@opc/core'
-import { EvolverLogEntryListSchema, MemoryEntryListSchema, MemoryStatsSchema } from '@opc/core'
+import type { EvolverLogEntry, MemoryEntry, MemoryStats } from '@opc/core'
+import { EvolverLogEntryListSchema, MemoryEntryListSchema } from '@opc/core'
 import type {
   LanceDBAdapter,
   LanceDBConfig,
@@ -10,17 +10,13 @@ import type {
   MemoryListParams,
   MemoryUpdatePatch,
 } from './LanceDBAdapter'
+import { deriveMemoryStats, keywordSearchEntries, listMemoryEntries, nowIso } from './memoryUtils'
 
 const repoRoot = resolve(process.cwd(), '../..')
 const mockRoot = process.env.OPC_MOCK_ROOT ?? resolve(repoRoot, 'data/mock')
-const memoryTypes: MemoryType[] = ['episodic', 'semantic', 'procedural']
 
 async function readMock<T>(fileName: string): Promise<T> {
   return JSON.parse(await readFile(resolve(mockRoot, fileName), 'utf8')) as T
-}
-
-function nowIso() {
-  return new Date().toISOString()
 }
 
 async function probeOllama(config: LanceDBConfig) {
@@ -76,6 +72,8 @@ export class MockLanceDBAdapter implements LanceDBAdapter {
       connected: this.connected,
       ollamaReachable: this.ollamaReachable,
       embeddingModel: this.embeddingModel,
+      source: 'mock',
+      semanticSearch: this.ollamaReachable && this.embeddingModel ? 'vector' : 'keyword-fallback',
       totalEntries: stats.total,
       byType: stats.byType,
     }
@@ -131,37 +129,11 @@ export class MockLanceDBAdapter implements LanceDBAdapter {
   }
 
   async list(params: MemoryListParams): Promise<{ entries: MemoryEntry[]; total: number }> {
-    const tags = new Set(params.tags ?? [])
-    const page = Math.max(1, params.page)
-    const pageSize = Math.min(200, Math.max(1, params.pageSize))
-    const filtered = Array.from(this.entries.values())
-      .filter((entry) => (params.includeArchived ? true : !entry.archived_at))
-      .filter((entry) => (params.type ? entry.type === params.type : true))
-      .filter((entry) => (tags.size === 0 ? true : entry.tags.some((tag) => tags.has(tag))))
-      .sort((left, right) => right.updated_at.localeCompare(left.updated_at))
-
-    const start = (page - 1) * pageSize
-    return { entries: filtered.slice(start, start + pageSize), total: filtered.length }
+    return listMemoryEntries(this.entries.values(), params)
   }
 
   async search(query: string, limit = 20): Promise<MemoryEntry[]> {
-    const needle = query.trim().toLowerCase()
-    if (!needle) {
-      return []
-    }
-
-    return Array.from(this.entries.values())
-      .filter((entry) => !entry.archived_at)
-      .map((entry) => {
-        const haystack = `${entry.content} ${entry.tags.join(' ')} ${entry.source}`.toLowerCase()
-        const tagMatch = entry.tags.some((tag) => tag.toLowerCase().includes(needle)) ? 2 : 0
-        const contentMatch = haystack.includes(needle) ? 1 : 0
-        return { entry, score: tagMatch + contentMatch + entry.quality_score }
-      })
-      .filter((item) => item.score > item.entry.quality_score)
-      .sort((left, right) => right.score - left.score)
-      .slice(0, Math.max(1, limit))
-      .map((item) => item.entry)
+    return keywordSearchEntries(this.entries.values(), query, limit)
   }
 
   async getEvolverLog(
@@ -198,21 +170,6 @@ export class MockLanceDBAdapter implements LanceDBAdapter {
   }
 
   async getStats(): Promise<MemoryStats> {
-    const all = Array.from(this.entries.values())
-    const active = all.filter((entry) => !entry.archived_at)
-    const byType = Object.fromEntries(
-      memoryTypes.map((type) => [type, active.filter((entry) => entry.type === type).length]),
-    ) as Record<MemoryType, number>
-
-    return MemoryStatsSchema.parse({
-      total: active.length,
-      byType,
-      archived: all.length - active.length,
-      core: active.filter((entry) => entry.is_core).length,
-      lastUpdated: all.reduce(
-        (latest, entry) => (entry.updated_at > latest ? entry.updated_at : latest),
-        nowIso(),
-      ),
-    })
+    return deriveMemoryStats(this.entries.values())
   }
 }

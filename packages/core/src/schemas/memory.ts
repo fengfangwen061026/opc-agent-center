@@ -38,6 +38,8 @@ export const LanceDBStatusSchema = z.object({
   connected: z.boolean(),
   ollamaReachable: z.boolean(),
   embeddingModel: z.string().nullable(),
+  source: z.enum(['mock', 'live-connected', 'live-unavailable']),
+  semanticSearch: z.enum(['vector', 'keyword-fallback']),
   totalEntries: z.number(),
   byType: z.object({
     episodic: z.number(),

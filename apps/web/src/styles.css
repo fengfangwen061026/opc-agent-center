@@ -1158,6 +1158,10 @@ input {
   font-weight: 800;
 }
 
+.opc-memory-offline.is-critical {
+  color: var(--opc-danger);
+}
+
 .opc-memory-layout {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr) minmax(280px, 320px);

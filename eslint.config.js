@@ -8,7 +8,9 @@ export default tseslint.config(
   {
     ignores: [
       '**/dist/**',
+      '**/dist-app/**',
       '**/node_modules/**',
+      '**/.node_modules-electron-pack/**',
       '**/coverage/**',
       '**/.turbo/**',
       'data/mock/**/*.json',

@@ -12,7 +12,7 @@
 ## 技术栈
 
 - 前端：React 19 + TypeScript + Vite + Tailwind + Zustand + TanStack Query + React Flow
-- Bridge：Node.js + TypeScript + Hono + better-sqlite3
+- Bridge：Node.js + TypeScript + Hono + LanceDB
 - Schema：Zod（packages/core，所有数据结构必须有 Zod schema）
 - 包管理：pnpm workspaces（不用 npm/yarn）
 - 测试：Vitest
@@ -47,27 +47,25 @@ opc-agent-center/
 
 ## 当前阶段
 
-**Phase 13 进行中**：Electron 桌面应用
+**真实链路加固（truthfulness hardening）**：优先修 real path 一致性，Electron scaffold 已完成。
 
-| 系统              | 状态    | 说明                                                                       |
-| ----------------- | ------- | -------------------------------------------------------------------------- |
-| OpenClaw Gateway  | ✅ live | ws://127.0.0.1:18789，v3 握手认证                                          |
-| LanceDB           | ✅ real | nomic-embed-text 语义搜索，50 条初始记忆                                   |
-| Ollama            | ✅ 运行 | nomic-embed-text + mxbai-embed-large                                       |
-| Obsidian          | ✅/🟡   | 桌面端已安装，用 scripts/start-obsidian.sh 启动；REST API 需 Obsidian 运行 |
-| WeChat            | ✅      | ClawBot 官方插件，通知推送渠道                                             |
-| 飞书              | ✅/🟡   | lark-cli 已配置，OpenClaw channel 需确认飞书应用凭据/机器人权限            |
-| Evolver           | ✅      | RealEvolverAdapter 已接入，降级到 Mock 时有日志提示                        |
-| Electron 主进程   | 🟡      | apps/electron 包已创建，开发模式可用                                       |
-| Bridge 子进程管理 | 🟡      | BridgeProcess 实现，异常自动重启                                           |
-| 生产打包          | 🟡      | electron-builder 配置完成，待实机验证                                      |
+| 系统 | 状态 | 说明 |
+| --- | --- | --- |
+| OpenClaw Gateway | ✅ adapter | live WebSocket 路径和认证逻辑已接入，运行态依赖本机 Gateway |
+| LanceDB | 🟡 hardening | real adapter 负责持久化；语义索引走 LanceDB，embedding 不可用时降级为关键词召回 |
+| Ollama | 🟡 optional | 仅影响 embedding / semantic recall，不应阻断 real CRUD |
+| Obsidian | ✅/🟡 | real adapter 与启动脚本已存在，运行态依赖桌面端和 Local REST API 插件 |
+| WeChat | ✅ channel | Bridge 已保留通知推送通路，运行态依赖本机 OpenClaw 插件配置 |
+| 飞书 | ✅/🟡 | Bridge 已保留通知推送通路，运行态依赖本机 OpenClaw / 飞书配置 |
+| Evolver | ✅/🟡 | live 模式优先尝试真实 adapter，不可达时自动降级到 mock |
+| Electron | ✅ scaffold | apps/electron、BridgeProcess 和 builder 配置已落地，待实机验证 |
 
 ## 启动命令
 
 完整 live 模式（推荐）：
 `OPENCLAW_MODE=live LANCEDB_MODE=real OBSIDIAN_MODE=real pnpm dev`
 
-开发模式（Electron 窗口）：
+开发模式（Electron 窗口，scaffold）：
 `pnpm electron:dev`
 
 生产打包：
@@ -77,9 +75,8 @@ opc-agent-center/
 
 ## 执行指令
 
-按 Phase 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 连续执行。
-每完成一个 Phase 输出验收 checklist，立刻进入下一个，不等确认。
-遇到阻塞（依赖不存在、外部系统不可用）用 mock/fallback 绕过并标注 TODO。
+优先保证 real path 的数据真值、降级行为和 health 一致性，再继续扩 UI 或桌面封装。
+外部系统不可用时保留真实降级逻辑，不要把 mock 数据伪装成 live 结果。
 
 - Obsidian 启动：`bash scripts/start-obsidian.sh`（需要桌面环境）
 - Evolver 接入：`OPENCLAW_MODE=live` 时自动尝试真实接入，失败自动降级

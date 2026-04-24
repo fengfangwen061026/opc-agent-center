@@ -27,6 +27,7 @@ export class BridgeProcess {
 
     this.lastEnv = env
     this.stopping = false
+    this.restartCount = 0
 
     void this.bridgeReady().then((ready) => {
       if (this.stopping || this.isRunning()) {
@@ -46,11 +47,20 @@ export class BridgeProcess {
   stop(): void {
     this.stopping = true
     this.attachedToExternalBridge = false
+    this.restartCount = 0
 
-    if (this.child && !this.child.killed) {
-      this.child.kill()
-    }
+    const child = this.child
     this.child = null
+
+    if (child && child.exitCode === null && !child.killed) {
+      child.kill('SIGTERM')
+      const killTimer = setTimeout(() => {
+        if (child.exitCode === null) {
+          child.kill('SIGKILL')
+        }
+      }, 3000)
+      child.once('exit', () => clearTimeout(killTimer))
+    }
   }
 
   getUrl(): string {

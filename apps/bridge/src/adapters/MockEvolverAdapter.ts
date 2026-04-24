@@ -46,6 +46,7 @@ export class MockEvolverAdapter implements EvolverAdapter {
   async getStatus(): Promise<EvolverStatus> {
     return EvolverStatusSchema.parse({
       status: this.connected ? 'idle' : 'disabled',
+      source: 'mock',
       pendingPatches: (await this.getPendingPatches()).length,
       weeklyAutoPatches: 5,
       autoPatchCountThisWeek: 5,

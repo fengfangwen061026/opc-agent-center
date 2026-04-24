@@ -7,6 +7,8 @@ export const SystemHealthSchema = z.object({
     connected: z.boolean(),
     ollamaReachable: z.boolean(),
     embeddingModel: z.string().nullable(),
+    source: z.enum(['mock', 'live-connected', 'live-unavailable']),
+    semanticSearch: z.enum(['vector', 'keyword-fallback']),
     totalEntries: z.number(),
   }),
   ollama: ConnectionStatusSchema,
@@ -17,6 +19,7 @@ export const SystemHealthSchema = z.object({
   }),
   evolver: z.object({
     status: z.enum(['idle', 'running', 'error', 'disabled']),
+    source: z.enum(['mock', 'live-connected', 'live-unavailable', 'protocol-unconfirmed']),
     lastRun: z.string().datetime().optional(),
     nextRun: z.string().datetime().optional(),
     pendingPatches: z.number(),

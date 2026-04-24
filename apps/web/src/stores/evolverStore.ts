@@ -17,6 +17,7 @@ interface EvolverStore {
 
 const fallbackStatus: EvolverStatus = {
   status: 'idle',
+  source: 'mock',
   pendingPatches: 2,
   weeklyAutoPatches: 5,
   autoPatchCountThisWeek: 5,
